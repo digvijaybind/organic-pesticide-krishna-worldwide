@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products | Organic Pesticide</title>
+    <meta name="description" content="Browse our complete range of natural pesticides, bio-gas fertilizers, soil health products, growth promoters and seeds.">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .page-hero{padding:160px 0 80px;background:linear-gradient(135deg,#0f172a,#1e3a2f);text-align:center}
+        .page-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:900;color:#fff;margin-bottom:16px}
+        .page-hero p{color:rgba(255,255,255,0.7);font-size:1.1rem;max-width:600px;margin:0 auto}
+        .breadcrumb{padding:12px 0;font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:20px}
+        .breadcrumb a{color:#22c55e}
+        .product-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:30px;padding:60px 0}
+        .prod-card{background:#fff;border-radius:20px;overflow:hidden;border:1px solid #e2e8f0;transition:all 0.3s}
+        .prod-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,0.1)}
+        .prod-card-img{height:220px;display:flex;align-items:center;justify-content:center;font-size:4rem}
+        .cat-pesticide .prod-card-img{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#16a34a}
+        .cat-fertilizer .prod-card-img{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#d97706}
+        .cat-soil .prod-card-img{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#2563eb}
+        .cat-growth .prod-card-img{background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:#db2777}
+        .cat-seeds .prod-card-img{background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:#059669}
+        .cat-micro .prod-card-img{background:linear-gradient(135deg,#fef9c3,#fef08a);color:#ca8a04}
+        .prod-card-body{padding:24px}
+        .prod-card-body h3{font-size:1.15rem;font-weight:700;margin-bottom:8px}
+        .prod-card-body p{font-size:0.85rem;color:#64748b;margin-bottom:16px;line-height:1.6}
+        .prod-card-meta{display:flex;justify-content:space-between;align-items:center}
+        .prod-price{font-weight:700;color:#16a34a;font-size:1rem}
+        .back-link{display:inline-flex;align-items:center;gap:8px;color:#16a34a;font-weight:600;margin-bottom:20px}
+        .cat-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;margin-bottom:12px}
+        .cat-badge.pesticide{background:#dcfce7;color:#16a34a}
+        .cat-badge.fertilizer{background:#fef3c7;color:#d97706}
+        .cat-badge.soil{background:#dbeafe;color:#2563eb}
+        .cat-badge.growth{background:#fce7f3;color:#db2777}
+        .cat-badge.seeds{background:#ecfdf5;color:#059669}
+        .cat-badge.micro{background:#fef9c3;color:#ca8a04}
+    </style>
+</head>
+<body>
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="../index.html" class="logo"><div class="logo-icon"><i class="fas fa-seedling"></i></div><div class="logo-text"><span class="logo-main">Organic Pesticide</span><span class="logo-sub">100% Natural Solutions</span></div></a>
+            <div class="nav-links" id="navLinks"><a href="../index.html" class="nav-link">Home</a><a href="../index.html#about" class="nav-link">About</a><a href="../index.html#products" class="nav-link">Products</a><a href="../index.html#categories" class="nav-link">Categories</a><a href="../index.html#why-us" class="nav-link">Why Us</a><a href="../index.html#contact" class="nav-link">Contact</a></div>
+            <div class="nav-actions"><button class="lang-toggle" id="langToggle"><span class="lang-en">हिं</span><span class="lang-hi" style="display:none;">EN</span></button><a href="../index.html#contact" class="nav-cta">Get Quote</a><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button></div>
+        </div>
+    </nav>
+    <section class="page-hero"><div class="container"><div class="breadcrumb"><a href="../index.html">Home</a> / All Products</div><h1>Our Complete Product Range</h1><p>30+ organic products for every stage of your farming journey.</p></div></section>
+    <section class="section"><div class="container"><a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        <div class="products-filter" style="margin-bottom:40px;">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="pesticide">Pesticides</button>
+            <button class="filter-btn" data-filter="fertilizer">Fertilizers</button>
+            <button class="filter-btn" data-filter="soil">Soil Health</button>
+            <button class="filter-btn" data-filter="growth">Growth</button>
+            <button class="filter-btn" data-filter="seeds">Seeds</button>
+            <button class="filter-btn" data-filter="micro">Micro Nutrition</button>
+        </div>
+        <div class="product-list-grid">
+            <!-- Pesticides -->
+            <div class="prod-card cat-pesticide scroll-reveal" data-category="pesticide"><div class="prod-card-img"><i class="fas fa-shield-virus"></i></div><div class="prod-card-body"><span class="cat-badge pesticide">Pesticide</span><h3>BioShield Pro</h3><p>Advanced natural pesticide. Effective against 200+ pest species.</p><div class="prod-card-meta"><span class="prod-price">From ₹299</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-pesticide scroll-reveal" data-category="pesticide"><div class="prod-card-img"><i class="fas fa-spray-can-sparkles"></i></div><div class="prod-card-body"><span class="cat-badge pesticide">Pesticide</span><h3>NeemGuard Spray</h3><p>Ready-to-use neem-based spray. Safe for all crops.</p><div class="prod-card-meta"><span class="prod-price">From ₹199</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-pesticide scroll-reveal" data-category="pesticide"><div class="prod-card-img"><i class="fas fa-bug-slash"></i></div><div class="prod-card-body"><span class="cat-badge pesticide">Pesticide</span><h3>TrichoKill Bio</h3><p>Trichoderma-based bio-fungicide for soil-borne diseases.</p><div class="prod-card-meta"><span class="prod-price">From ₹349</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-pesticide scroll-reveal" data-category="pesticide"><div class="prod-card-img"><i class="fas fa-mortar-pestle"></i></div><div class="prod-card-body"><span class="cat-badge pesticide">Pesticide</span><h3>Bt-Based Larvicide</h3><p>For bollworms and stem borers control.</p><div class="prod-card-meta"><span class="prod-price">From ₹275</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-pesticide scroll-reveal" data-category="pesticide"><div class="prod-card-img"><i class="fas fa-atom"></i></div><div class="prod-card-body"><span class="cat-badge pesticide">Pesticide</span><h3>Nano Silver AG+</h3><p>Nano silver for bacterial, viral and fungal diseases.</p><div class="prod-card-meta"><span class="prod-price">From ₹672</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <!-- Fertilizers -->
+            <div class="prod-card cat-fertilizer scroll-reveal" data-category="fertilizer"><div class="prod-card-img"><i class="fas fa-fire"></i></div><div class="prod-card-body"><span class="cat-badge fertilizer">Fertilizer</span><h3>BioGas Gold Fertilizer</h3><p>Premium bio-gas fertilizer rich in NPK and microbes.</p><div class="prod-card-meta"><span class="prod-price">From ₹449</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-fertilizer scroll-reveal" data-category="fertilizer"><div class="prod-card-img"><i class="fas fa-recycle"></i></div><div class="prod-card-body"><span class="cat-badge fertilizer">Fertilizer</span><h3>BioVermi Compost</h3><p>Vermicompost enriched with bio-gas slurry.</p><div class="prod-card-meta"><span class="prod-price">From ₹375</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-fertilizer scroll-reveal" data-category="fertilizer"><div class="prod-card-img"><i class="fas fa-droplet"></i></div><div class="prod-card-body"><span class="cat-badge fertilizer">Fertilizer</span><h3>Bio-Gas Liquid Feed</h3><p>Concentrated liquid fertilizer for drip irrigation.</p><div class="prod-card-meta"><span class="prod-price">From ₹520</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <!-- Soil Health -->
+            <div class="prod-card cat-soil scroll-reveal" data-category="soil"><div class="prod-card-img"><i class="fas fa-mountain-sun"></i></div><div class="prod-card-body"><span class="cat-badge soil">Soil Health</span><h3>SoilRestore Plus</h3><p>Complete soil health kit with humic acid and bacteria.</p><div class="prod-card-meta"><span class="prod-price">From ₹599</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-soil scroll-reveal" data-category="soil"><div class="prod-card-img"><i class="fas fa-flask"></i></div><div class="prod-card-body"><span class="cat-badge soil">Soil Health</span><h3>Humic Acid Supreme</h3><p>98% pure humic acid for soil conditioning.</p><div class="prod-card-meta"><span class="prod-price">From ₹470</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <!-- Growth -->
+            <div class="prod-card cat-growth scroll-reveal" data-category="growth"><div class="prod-card-img"><i class="fas fa-chart-line"></i></div><div class="prod-card-body"><span class="cat-badge growth">Growth</span><h3>GrowthVita Bio</h3><p>Bio-stimulant with amino acids and seaweed extract.</p><div class="prod-card-meta"><span class="prod-price">From ₹349</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-growth scroll-reveal" data-category="growth"><div class="prod-card-img"><i class="fas fa-dna"></i></div><div class="prod-card-body"><span class="cat-badge growth">Growth</span><h3>Mycorrhiza Plus</h3><p>Nano mycorrhiza for enhanced root development.</p><div class="prod-card-meta"><span class="prod-price">From ₹340</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <!-- Seeds -->
+            <div class="prod-card cat-seeds scroll-reveal" data-category="seeds"><div class="prod-card-img"><i class="fas fa-seedling"></i></div><div class="prod-card-body"><span class="cat-badge seeds">Seeds</span><h3>Organic Vegetable Seeds</h3><p>10 vegetable seed varieties. Non-GMO and organic.</p><div class="prod-card-meta"><span class="prod-price">From ₹249</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-seeds scroll-reveal" data-category="seeds"><div class="prod-card-img"><i class="fas fa-apple-whole"></i></div><div class="prod-card-body"><span class="cat-badge seeds">Seeds</span><h3>Fruit Saplings Pack</h3><p>Mango, Guava, Pomegranate, Lemon saplings.</p><div class="prod-card-meta"><span class="prod-price">From ₹899</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <!-- Micro Nutrition -->
+            <div class="prod-card cat-micro scroll-reveal" data-category="micro"><div class="prod-card-img"><i class="fas fa-flask-vial"></i></div><div class="prod-card-body"><span class="cat-badge micro">Micro Nutrition</span><h3>Zinc Sulphate Organic</h3><p>Chelated zinc for chlorophyll production.</p><div class="prod-card-meta"><span class="prod-price">From ₹280</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+            <div class="prod-card cat-micro scroll-reveal" data-category="micro"><div class="prod-card-img"><i class="fas fa-gem"></i></div><div class="prod-card-body"><span class="cat-badge micro">Micro Nutrition</span><h3>Multi-Mineral Spray</h3><p>7 essential minerals in chelated form.</p><div class="prod-card-meta"><span class="prod-price">From ₹450</span><a href="../index.html#contact" class="btn btn-sm">Enquire</a></div></div></div>
+        </div>
+    </div></section>
+    <footer class="footer"><div class="container"><div class="footer-bottom" style="border:none;"><p>&copy; 2026 Organic Pesticide. All rights reserved.</p></div></div></footer>
+    <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!" class="whatsapp-widget" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    <script src="../js/main.js"></script>
+</body>
+</html>
