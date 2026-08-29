@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (prevBtn) prevBtn.addEventListener('click', () => { prev(); resetAutoplay(); });
 
     function startAutoplay() {
-        interval = setInterval(next, 5000);
+        interval = setInterval(next, 2000);
     }
     function resetAutoplay() {
         clearInterval(interval);

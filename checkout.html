@@ -206,56 +206,90 @@
 
             const selectedMethod = document.querySelector('.pay-method.selected').dataset.method;
 
+            // ---- Order data payload (used by both server & local fallback) ----
+            const subtotal = Cart.subtotal();
+            const shippingFee = Cart.shipping();
+            const payload = { customer, items, subtotal, shipping: shippingFee, total: subtotal + shippingFee };
+
+            let orderData = null;
+
+            // ---- 1. Try server-side order creation (works on PHP hosting) ----
             try {
-                // 1. Create order on server
                 const orderRes = await fetch('backend/api/order.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ customer, items })
                 });
-                const orderData = await orderRes.json();
-
-                if (!orderData.success) {
-                    showNote(orderData.message || 'Order failed', 'error');
-                    btn.disabled = false;
-                    return;
+                const json = await orderRes.json();
+                if (json && json.success && json.order_id) {
+                    orderData = json;
                 }
-
-                const orderId = orderData.order_id;
-
-                if (selectedMethod === 'cod') {
-                    // COD - just confirm
-                    Cart.clear();
-                    showNote('Order placed! Pay on delivery.', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'thankyou.html?order=' + orderId + '&status=cod';
-                    }, 1200);
-                    return;
-                }
-
-                // 2. Paytm payment
-                await startPaytm(orderId);
-            } catch (err) {
-                console.error(err);
-                showNote('Something went wrong. Please try again.', 'error');
-                btn.disabled = false;
+            } catch (serverErr) {
+                // PHP backend unavailable (e.g. static hosting POC) - fall through to local order
             }
+
+            if (!orderData) {
+                // ---- POC fallback: create order locally (no PHP backend) ----
+                orderData = createLocalOrder(payload);
+            }
+
+            const orderId = orderData.order_id;
+
+            if (selectedMethod === 'cod') {
+                Cart.clear();
+                showNote('Order placed! Pay on delivery.', 'success');
+                setTimeout(() => {
+                    window.location.href = 'thankyou.html?order=' + orderId + '&status=cod';
+                }, 1200);
+                return;
+            }
+
+            // ---- 2. Paytm payment (needs the PHP backend + live keys) ----
+            await startPaytm(orderId);
         });
 
+        // Create a client-side order when no PHP backend is available (POC on static hosting).
+        // Keeps the demo flow working; real orders persist on PHP hosting (cPanel).
+        function createLocalOrder(payload) {
+            const orderId = 'OP' + Date.now() + String(Math.floor(Math.random() * 100)).padStart(2, '0');
+            const order = Object.assign({
+                order_id: orderId,
+                created_at: new Date().toISOString(),
+                payment_status: 'PENDING',
+                payment_method: document.querySelector('.pay-method.selected').dataset.method,
+                source: 'local-poc'
+            }, payload);
+
+            // Store in localStorage so the POC can "keep" the order
+            const key = 'organic_pesticide_orders';
+            let orders = [];
+            try { orders = JSON.parse(localStorage.getItem(key)) || []; } catch (e) { orders = []; }
+            orders.push(order);
+            localStorage.setItem(key, JSON.stringify(orders));
+
+            return order;
+        }
+
         async function startPaytm(orderId) {
-            showNote('Connecting to Paytm...', 'info');
+            showNote('Connecting to payment gateway...', 'info');
 
             // Get transaction token from server
-            const res = await fetch('backend/paytm/initiate.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ order_id: orderId })
-            });
-            const data = await res.json();
+            let data;
+            try {
+                const res = await fetch('backend/paytm/initiate.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId })
+                });
+                data = await res.json();
+            } catch (err) {
+                // PHP backend not running (static hosting POC) => gateway unavailable
+                pMOCUnavailable(orderId);
+                return;
+            }
 
-            if (!data.success) {
-                showNote(data.message || 'Paytm initiation failed', 'error');
-                document.getElementById('placeOrderBtn').disabled = false;
+            if (!data || !data.success) {
+                pMOCUnavailable(orderId, data && data.message);
                 return;
             }
 
@@ -309,6 +343,21 @@
                 document.getElementById('placeOrderBtn').disabled = false;
             };
             document.head.appendChild(sdkScript);
+        }
+
+        // Paytm gateway is not available (PHP backend not running on this host, or not configured).
+        // For the POC we show a clear message and let the customer choose COD so the flow completes.
+        function pMOCUnavailable(orderId, backendMsg) {
+            showNote(
+                (backendMsg ? backendMsg + ' ' : '') +
+                'Online payment needs the live PHP hosting. Please select Cash on Delivery.',
+                'error'
+            );
+            document.getElementById('placeOrderBtn').disabled = false;
+            // Automatically highlight COD so the demo can move forward
+            document.querySelectorAll('.pay-method').forEach(e => e.classList.remove('selected'));
+            const cod = document.querySelector('.pay-method[data-method="cod"]');
+            if (cod) cod.classList.add('selected');
         }
 
         function showNote(msg, type) {

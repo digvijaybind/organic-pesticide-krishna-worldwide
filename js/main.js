@@ -98,6 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
         rootMargin: '0px 0px -50px 0px'
     });
 
+    // Expose globally so dynamically-added elements (e.g. product cards)
+    // can be observed after render.
+    window.revealObserver = revealObserver;
+
     scrollRevealElements.forEach(el => revealObserver.observe(el));
 
     // ===== COUNTER ANIMATION =====

@@ -99,9 +99,14 @@ async function renderProducts() {
     `).join('');
 
     // Re-trigger scroll reveal
-    if (window.revealObserver) {
-        document.querySelectorAll('#productsGrid .scroll-reveal').forEach(el => window.revealObserver.observe(el));
-    }
+    document.querySelectorAll('#productsGrid .scroll-reveal').forEach(el => {
+        if (window.revealObserver) {
+            window.revealObserver.observe(el);
+        } else {
+            // No observer available - reveal immediately so cards aren't hidden
+            el.classList.add('revealed');
+        }
+    });
 }
 
 /**
