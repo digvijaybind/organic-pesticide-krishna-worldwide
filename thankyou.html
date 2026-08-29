@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation | Organic Pesticide</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .thankyou-section { padding: 120px 20px; text-align: center; min-height: 70vh; display: flex; align-items: center; justify-content: center; }
+        .thankyou-box { max-width: 520px; margin: 0 auto; }
+        .success-icon { width: 96px; height: 96px; border-radius: 50%; background: #dcfce7; color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 24px; animation: popIn 0.6s ease; }
+        .failed-icon { background: #fee2e2; color: #dc2626; }
+        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+        p.status-line { color: #64748b; margin-bottom: 8px; }
+        .order-id { font-size: 1.1rem; font-weight: 700; color: #16a34a; background: #f0fdf4; display: inline-block; padding: 8px 20px; border-radius: 20px; margin: 12px 0 24px; }
+        .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        @keyframes popIn { 0%{transform:scale(0);opacity:0} 80%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+    </style>
+</head>
+<body>
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fas fa-seedling"></i></div>
+                <div class="logo-text">
+                    <span class="logo-main">Organic Pesticide</span>
+                    <span class="logo-sub">100% Natural Solutions</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#products" class="nav-link">Products</a>
+                <a href="index.html#contact" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="thankyou-section">
+        <div class="thankyou-box">
+            <div class="success-icon" id="statusIcon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 id="statusTitle">Thank You!</h1>
+            <p class="status-line" id="statusMessage">Your order has been placed successfully.</p>
+            <div class="order-id" id="orderIdBox"></div>
+            <div class="btn-group">
+                <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+                <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!%20I%20just%20placed%20an%20order." class="btn btn-whatsapp" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Track on WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom" style="border:none;">
+                <p>&copy; 2026 Organic Pesticide - Krishna Worldwide. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(location.search);
+            const status = params.get('status') || 'success';
+            const order = params.get('order') || '';
+
+            const icon = document.getElementById('statusIcon');
+            const title = document.getElementById('statusTitle');
+            const msg = document.getElementById('statusMessage');
+            const box = document.getElementById('orderIdBox');
+
+            if (order) {
+                box.textContent = 'Order ID: ' + order;
+            } else {
+                box.style.display = 'none';
+            }
+
+            if (status === 'cod') {
+                title.textContent = 'Order Placed!';
+                msg.textContent = 'Pay on delivery when your order arrives.';
+            } else if (status === 'success') {
+                title.textContent = 'Payment Successful!';
+                msg.textContent = 'Your payment was received. We will deliver your order soon.';
+            } else if (status === 'failed') {
+                icon.classList.add('failed-icon');
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                title.textContent = 'Payment Failed';
+                msg.textContent = 'Your payment was not completed. You can try again from the cart.';
+                box.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

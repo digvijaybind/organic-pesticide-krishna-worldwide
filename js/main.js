@@ -133,22 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 16);
     }
 
-    // ===== HERO PARTICLES =====
-    const heroParticles = document.getElementById('heroParticles');
-    if (heroParticles) {
-        for (let i = 0; i < 30; i++) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            const size = Math.random() * 10 + 4;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
-            particle.style.animationDelay = (Math.random() * 10) + 's';
-            heroParticles.appendChild(particle);
-        }
-    }
-
     // ===== PRODUCT FILTER =====
     const filterBtns = document.querySelectorAll('.filter-btn');
     const productCards = document.querySelectorAll('.product-card[data-category]');

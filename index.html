@@ -44,6 +44,10 @@
                 <a href="#contact" class="nav-link" data-en="Contact" data-hi="संपर्क">Contact</a>
             </div>
             <div class="nav-actions">
+                <a href="cart.html" class="cart-link" title="View Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" style="display:none;">0</span>
+                </a>
                 <button class="lang-toggle" id="langToggle" title="Switch Language">
                     <span class="lang-en">हिं</span>
                     <span class="lang-hi" style="display:none;">EN</span>
@@ -56,41 +60,132 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Carousel -->
     <section class="hero" id="home">
-        <div class="hero-particles" id="heroParticles"></div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-badge animate-fade-in" data-en="🌾 Trusted by 10,000+ Farmers" data-hi="🌾 10,000+ किसानों का भरोसा">🌾 Trusted by 10,000+ Farmers</div>
-            <h1 class="hero-title animate-slide-up">
-                <span data-en="Grow Chemical-Free" data-hi="रासायनिक मुक्त उगाएं">Grow Chemical-Free</span><br>
-                <span class="gradient-text" data-en="With Nature's Protection" data-hi="प्रकृति के संरक्षण के साथ">With Nature's Protection</span>
-            </h1>
-            <p class="hero-description animate-slide-up delay-1" data-en="Premium natural pesticides and bio-gas fertilizers crafted for the modern Indian farmer. Protect your crops, enrich your soil, harvest better." data-hi="आधुनिक भारतीय किसान के लिए बनाए गए प्रीमियम प्राकृतिक कीटनाशक और बायोगैस खाद। अपनी फसल की रक्षा करें, अपनी मिट्टी को समृद्ध करें, बेहतर फसल काटें।">Premium natural pesticides and bio-gas fertilizers crafted for the modern Indian farmer. Protect your crops, enrich your soil, harvest better.</p>
-            <div class="hero-buttons animate-slide-up delay-2">
-                <a href="#products" class="btn btn-primary" data-en="Explore Products" data-hi="उत्पाद देखें">
-                    <i class="fas fa-arrow-right"></i> <span data-en="Explore Products" data-hi="उत्पाद देखें">Explore Products</span>
-                </a>
-                <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!%20I%20need%20information%20about%20your%20products." class="btn btn-whatsapp" target="_blank">
-                    <i class="fab fa-whatsapp"></i> <span data-en="Chat on WhatsApp" data-hi="व्हाट्सएप पर चैट करें">Chat on WhatsApp</span>
-                </a>
-            </div>
-            <div class="hero-stats animate-slide-up delay-3">
-                <div class="hero-stat">
-                    <span class="hero-stat-number" data-count="10000">0</span><span class="hero-stat-plus">+</span>
-                    <span class="hero-stat-label" data-en="Happy Farmers" data-hi="खुश किसान">Happy Farmers</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="hero-stat-number" data-count="50">0</span><span class="hero-stat-plus">+</span>
-                    <span class="hero-stat-label" data-en="Products" data-hi="उत्पाद">Products</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="hero-stat-number" data-count="3">0</span>
-                    <span class="hero-stat-label" data-en="States Covered" data-hi="राज्य कवर">States Covered</span>
+        <div class="hero-carousel" id="heroCarousel">
+
+            <!-- Slide 1 -->
+            <div class="hero-slide active" style="--slide-grad: linear-gradient(135deg, #0f172a 0%, #1e3a2f 50%, #166534 100%);">
+                <div class="hero-particles"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-badge animate-fade-in" data-en="🌾 Trusted by 10,000+ Farmers" data-hi="🌾 10,000+ किसानों का भरोसा">🌾 Trusted by 10,000+ Farmers</div>
+                    <h1 class="hero-title">
+                        <span data-en="Grow Chemical-Free" data-hi="रासायनिक मुक्त उगाएं">Grow Chemical-Free</span><br>
+                        <span class="gradient-text" data-en="With Nature's Protection" data-hi="प्रकृति के संरक्षण के साथ">With Nature's Protection</span>
+                    </h1>
+                    <p class="hero-description" data-en="Premium natural pesticides and bio-gas fertilizers crafted for the modern Indian farmer. Protect your crops, enrich your soil, harvest better." data-hi="आधुनिक भारतीय किसान के लिए बनाए गए प्रीमियम प्राकृतिक कीटनाशक और बायोगैस खाद।">Premium natural pesticides and bio-gas fertilizers crafted for the modern Indian farmer. Protect your crops, enrich your soil, harvest better.</p>
+                    <div class="hero-buttons">
+                        <a href="#products" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i> <span data-en="Explore Products" data-hi="उत्पाद देखें">Explore Products</span>
+                        </a>
+                        <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!%20I%20need%20information%20about%20your%20products." class="btn btn-whatsapp" target="_blank">
+                            <i class="fab fa-whatsapp"></i> <span data-en="Chat on WhatsApp" data-hi="व्हाट्सएप पर चैट करें">Chat on WhatsApp</span>
+                        </a>
+                    </div>
                 </div>
             </div>
+
+            <!-- Slide 2: Bio-gas fertilizer -->
+            <div class="hero-slide" style="--slide-grad: linear-gradient(135deg, #78350f 0%, #92400e 50%, #a16207 100%);">
+                <div class="hero-particles"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-badge animate-fade-in" data-en="🔥 Bio-Gas Fertilizer" data-hi="🔥 बायोगैस खाद">🔥 Bio-Gas Fertilizer</div>
+                    <h1 class="hero-title">
+                        <span data-en="Bio-Gas Fertilizer" data-hi="बायोगैस खाद">Bio-Gas Fertilizer</span><br>
+                        <span class="gradient-text" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);" data-en="For Maximum Yield" data-hi="अधिकतम उपज के लिए">For Maximum Yield</span>
+                    </h1>
+                    <p class="hero-description" data-en="Nutrient-rich organic fertilizer rich in NPK and beneficial microbes. Enrich your soil, boost your harvest naturally." data-hi="NPK और लाभकारी सूक्ष्मजीवों से भरपूर जैविक खाद।">Nutrient-rich organic fertilizer rich in NPK and beneficial microbes. Enrich your soil, boost your harvest naturally.</p>
+                    <div class="hero-buttons">
+                        <a href="#products" class="btn btn-primary">
+                            <i class="fas fa-fire"></i> <span data-en="View Fertilizers" data-hi="खाद देखें">View Fertilizers</span>
+                        </a>
+                        <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!%20I%20want%20bio-gas%20fertilizer." class="btn btn-whatsapp" target="_blank">
+                            <i class="fab fa-whatsapp"></i> <span data-en="Order Now" data-hi="अभी ऑर्डर करें">Order Now</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Natural pesticide -->
+            <div class="hero-slide" style="--slide-grad: linear-gradient(135deg, #052e16 0%, #14532d 50%, #166534 100%);">
+                <div class="hero-particles"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-badge animate-fade-in" data-en="🌿 100% Natural" data-hi="🌿 100% प्राकृतिक">🌿 100% Natural</div>
+                    <h1 class="hero-title">
+                        <span data-en="Natural Pesticide" data-hi="प्राकृतिक कीटनाशक">Natural Pesticide</span><br>
+                        <span class="gradient-text" data-en="Safe & Highly Effective" data-hi="सुरक्षित और अत्यधिक प्रभावी">Safe & Highly Effective</span>
+                    </h1>
+                    <p class="hero-description" data-en="Protect your crops from pests without harming soil, water or beneficial insects. Chemical-free farming starts here." data-hi="बिना मिट्टी, पानी या लाभकारी कीड़ों को नुकसान पहुंचाए अपनी फसलों को कीटों से बचाएं।">Protect your crops from pests without harming soil, water or beneficial insects. Chemical-free farming starts here.</p>
+                    <div class="hero-buttons">
+                        <a href="#products" class="btn btn-primary">
+                            <i class="fas fa-shield-halved"></i> <span data-en="View Pesticides" data-hi="कीटनाशक देखें">View Pesticides</span>
+                        </a>
+                        <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!%20I%20need%20natural%20pesticide." class="btn btn-whatsapp" target="_blank">
+                            <i class="fab fa-whatsapp"></i> <span data-en="Ask Expert" data-hi="विशेषज्ञ से पूछें">Ask Expert</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Trust / States -->
+            <div class="hero-slide" style="--slide-grad: linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);">
+                <div class="hero-particles"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-badge animate-fade-in" data-en="🤝 Trusted Across 3 States" data-hi="🤝 3 राज्यों में भरोसेमंद">🤝 Trusted Across 3 States</div>
+                    <h1 class="hero-title">
+                        <span data-en="Trusted by 10,000+" data-hi="10,000+ किसानों का">Trusted by 10,000+</span><br>
+                        <span class="gradient-text" style="background:linear-gradient(135deg,#38bdf8,#22c55e);" data-en="Farmers Everywhere" data-hi="भरोसा">Farmers Everywhere</span>
+                    </h1>
+                    <p class="hero-description" data-en="Serving farmers, orchard caretakers, nurseries and garden lovers across Maharashtra, Gujarat and Madhya Pradesh." data-hi="महाराष्ट्र, गुजरात और मध्य प्रदेश में किसानों की सेवा।">Serving farmers, orchard caretakers, nurseries and garden lovers across Maharashtra, Gujarat and Madhya Pradesh.</p>
+                    <div class="hero-buttons">
+                        <a href="#testimonials" class="btn btn-primary">
+                            <i class="fas fa-comments"></i> <span data-en="See Testimonials" data-hi="प्रशंसापत्र देखें">See Testimonials</span>
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat-number" data-count="10000">0</span><span class="hero-stat-plus">+</span>
+                            <span class="hero-stat-label" data-en="Happy Farmers" data-hi="खुश किसान">Happy Farmers</span>
+                        </div>
+                        <div class="hero-stat-divider"></div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-number" data-count="3">0</span>
+                            <span class="hero-stat-label" data-en="States Covered" data-hi="राज्य कवर">States Covered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: CTA -->
+            <div class="hero-slide" style="--slide-grad: linear-gradient(135deg, #111827 0%, #1f2937 50%, #374151 100%);">
+                <div class="hero-particles"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-badge animate-fade-in" data-en="📞 Free Consultation" data-hi="📞 मुफ्त परामर्श">📞 Free Consultation</div>
+                    <h1 class="hero-title">
+                        <span data-en="Get Expert Advice" data-hi="विशेषज्ञ सलाह लें">Get Expert Advice</span><br>
+                        <span class="gradient-text" style="background:linear-gradient(135deg,#34d399,#f59e0b);" data-en="For Your Farm" data-hi="अपने खेत के लिए">For Your Farm</span>
+                    </h1>
+                    <p class="hero-description" data-en="Talk to our agricultural experts for personalized recommendations for your specific crop, soil and region." data-hi="अपनी विशिष्ट फसल, मिट्टी और क्षेत्र के लिए व्यक्तिगत सिफारिशों के लिए हमारे कृषि विशेषज्ञों से बात करें।">Talk to our agricultural experts for personalized recommendations for your specific crop, soil and region.</p>
+                    <div class="hero-buttons">
+                        <a href="#contact" class="btn btn-primary">
+                            <i class="fas fa-phone"></i> <span data-en="Call Now" data-hi="अभी कॉल करें">Call Now</span>
+                        </a>
+                        <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!%20I%20need%20consultation." class="btn btn-whatsapp" target="_blank">
+                            <i class="fab fa-whatsapp"></i> <span data-en="WhatsApp Us" data-hi="व्हाट्सएप करें">WhatsApp Us</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Controls -->
+            <button class="carousel-arrow prev" id="heroPrev"><i class="fas fa-chevron-left"></i></button>
+            <button class="carousel-arrow next" id="heroNext"><i class="fas fa-chevron-right"></i></button>
+            <div class="carousel-dots" id="heroDots"></div>
         </div>
         <div class="hero-scroll">
             <a href="#about"><i class="fas fa-chevron-down"></i></a>
@@ -221,86 +316,11 @@
                 <button class="filter-btn" data-filter="growth" data-en="Growth" data-hi="वृद्धि">Growth</button>
             </div>
             <div class="products-grid" id="productsGrid">
-                <!-- Product 1 -->
-                <div class="product-card scroll-reveal" data-category="pesticide" style="--delay: 0.1s">
-                    <div class="product-badge" data-en="Best Seller" data-hi="बेस्ट सेलर">Best Seller</div>
-                    <div class="product-image"><i class="fas fa-shield-virus"></i></div>
-                    <div class="product-info">
-                        <h3 data-en="BioShield Pro" data-hi="बायोशील्ड प्रो">BioShield Pro</h3>
-                        <p data-en="Advanced natural pesticide for all types of crops. Effective against 200+ pest species." data-hi="सभी प्रकार की फसलों के लिए उन्नत प्राकृतिक कीटनाशक। 200+ प्रजातियों के कीटों के खिलाफ प्रभावी।">Advanced natural pesticide for all types of crops. Effective against 200+ pest species.</p>
-                        <div class="product-meta">
-                            <span class="product-price" data-en="Starting ₹299" data-hi="शुरू ₹299 से">Starting ₹299</span>
-                            <a href="#" class="btn btn-sm" data-en="Enquire" data-hi="पूछताछ करें">Enquire</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Product 2 -->
-                <div class="product-card scroll-reveal" data-category="fertilizer" style="--delay: 0.2s">
-                    <div class="product-badge" data-en="Popular" data-hi="लोकप्रिय">Popular</div>
-                    <div class="product-image"><i class="fas fa-fire"></i></div>
-                    <div class="product-info">
-                        <h3 data-en="BioGas Gold Fertilizer" data-hi="बायोगैस गोल्ड खाद">BioGas Gold Fertilizer</h3>
-                        <p data-en="Premium bio-gas fertilizer rich in NPK and beneficial microbes for maximum yield." data-hi="अधिकतम उपज के लिए NPK और लाभकारी सूक्ष्मजीवों से भरपूर प्रीमियम बायोगैस खाद।">Premium bio-gas fertilizer rich in NPK and beneficial microbes for maximum yield.</p>
-                        <div class="product-meta">
-                            <span class="product-price" data-en="Starting ₹449" data-hi="शुरू ₹449 से">Starting ₹449</span>
-                            <a href="#" class="btn btn-sm" data-en="Enquire" data-hi="पूछताछ करें">Enquire</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Product 3 -->
-                <div class="product-card scroll-reveal" data-category="soil" style="--delay: 0.3s">
-                    <div class="product-image"><i class="fas fa-mountain-sun"></i></div>
-                    <div class="product-info">
-                        <h3 data-en="SoilRestore Plus" data-hi="सॉइल रिस्टोर प्लस">SoilRestore Plus</h3>
-                        <p data-en="Complete soil health kit with humic acid, beneficial bacteria, and organic matter." data-hi="ह्यूमिक एसिड, लाभकारी बैक्टीरिया और जैविक पदार्थ के साथ संपूर्ण मिट्टी स्वास्थ्य किट।">Complete soil health kit with humic acid, beneficial bacteria, and organic matter.</p>
-                        <div class="product-meta">
-                            <span class="product-price" data-en="Starting ₹599" data-hi="शुरू ₹599 से">Starting ₹599</span>
-                            <a href="#" class="btn btn-sm" data-en="Enquire" data-hi="पूछताछ करें">Enquire</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Product 4 -->
-                <div class="product-card scroll-reveal" data-category="pesticide" style="--delay: 0.4s">
-                    <div class="product-badge" data-en="New" data-hi="नया">New</div>
-                    <div class="product-image"><i class="fas fa-spray-can-sparkles"></i></div>
-                    <div class="product-info">
-                        <h3 data-en="NeemGuard Spray" data-hi="नीमगार्ड स्प्रे">NeemGuard Spray</h3>
-                        <p data-en="Ready-to-use neem-based spray for organic pest control. Safe for all crops." data-hi="जैविक कीट नियंत्रण के लिए उपयोग के लिए तैयार नीम-आधारित स्प्रे। सभी फसलों के लिए सुरक्षित।">Ready-to-use neem-based spray for organic pest control. Safe for all crops.</p>
-                        <div class="product-meta">
-                            <span class="product-price" data-en="Starting ₹199" data-hi="शुरू ₹199 से">Starting ₹199</span>
-                            <a href="#" class="btn btn-sm" data-en="Enquire" data-hi="पूछताछ करें">Enquire</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Product 5 -->
-                <div class="product-card scroll-reveal" data-category="growth" style="--delay: 0.5s">
-                    <div class="product-image"><i class="fas fa-chart-line"></i></div>
-                    <div class="product-info">
-                        <h3 data-en="GrowthVita Bio" data-hi="ग्रोथविटा बायो">GrowthVita Bio</h3>
-                        <p data-en="Bio-stimulant with amino acids, seaweed extract and trace elements for vigorous growth." data-hi="जोरदार वृद्धि के लिए एमिनो एसिड, समुद्री शैवाल निकालने और सूक्ष्म तत्वों से भरपूर बायो-स्टिमुलेंट।">Bio-stimulant with amino acids, seaweed extract and trace elements for vigorous growth.</p>
-                        <div class="product-meta">
-                            <span class="product-price" data-en="Starting ₹349" data-hi="शुरू ₹349 से">Starting ₹349</span>
-                            <a href="#" class="btn btn-sm" data-en="Enquire" data-hi="पूछताछ करें">Enquire</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Product 6 -->
-                <div class="product-card scroll-reveal" data-category="fertilizer" style="--delay: 0.6s">
-                    <div class="product-badge" data-en="Eco" data-hi="इको">Eco</div>
-                    <div class="product-image"><i class="fas fa-recycle"></i></div>
-                    <div class="product-info">
-                        <h3 data-en="BioVermi Compost" data-hi="बायोवर्मी कम्पोस्ट">BioVermi Compost</h3>
-                        <p data-en="Vermicompost enriched with bio-gas slurry. Perfect for vegetable and fruit crops." data-hi="बायोगैस स्लरी से समृद्ध वर्मीकम्पोस्ट। सब्जी और फल फसलों के लिए बिल्कुल सही।">Vermicompost enriched with bio-gas slurry. Perfect for vegetable and fruit crops.</p>
-                        <div class="product-meta">
-                            <span class="product-price" data-en="Starting ₹375" data-hi="शुरू ₹375 से">Starting ₹375</span>
-                            <a href="#" class="btn btn-sm" data-en="Enquire" data-hi="पूछताछ करें">Enquire</a>
-                        </div>
-                    </div>
-                </div>
+                <!-- Products loaded dynamically from backend/catalog.js -->
             </div>
             <div class="products-cta scroll-reveal">
-                <a href="pages/all-products.html" class="btn btn-primary btn-lg" data-en="View All Products" data-hi="सभी उत्पाद देखें">
-                    <span data-en="View All Products" data-hi="सभी उत्पाद देखें">View All Products</span> <i class="fas fa-arrow-right"></i>
+                <a href="pages/all-products.html" class="btn btn-primary btn-lg">
+                    <span>View All Products</span> <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
@@ -625,6 +645,9 @@
     <!-- Back to Top -->
     <a href="#" class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></a>
 
+    <script src="js/cart.js"></script>
+    <script src="js/catalog.js"></script>
+    <script src="js/carousel.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

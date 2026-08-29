@@ -1,0 +1,32 @@
+# ============================================================
+#  ORGANIC PESTICIDE - BACKEND PROTECTION (Apache)
+#  Security rules for the /backend directory.
+#
+#  Best practice:
+#   - Place sensitive config OUTSIDE the public web root
+#   - Never allow direct browser access to config/, orders/, logs/
+# ============================================================
+
+Options -Indexes
+
+# Block direct access to sensitive subdirectories
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(config|orders|logs)/ - [F,L]
+</IfModule>
+
+# Deny access to dotfiles (like .htaccess itself)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Deny direct access to the Paytm library class (only included via require)
+<Files "Paytm.class.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Note: api/*.php and paytm/*.php endpoints remain accessible as normal
+# because they are entry points reached via HTTP. The class and config
+# files are protected above.

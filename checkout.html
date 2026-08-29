@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Organic Pesticide - Krishna Worldwide</title>
+    <meta name="description" content="Complete your order with secure payment.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fas fa-seedling"></i></div>
+                <div class="logo-text">
+                    <span class="logo-main">Organic Pesticide</span>
+                    <span class="logo-sub">100% Natural Solutions</span>
+                </div>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#products" class="nav-link">Products</a>
+                <a href="cart.html" class="nav-link">Cart</a>
+                <a href="index.html#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <a href="cart.html" class="cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" style="display:none;">0</span>
+                </a>
+                <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-hero-slim">
+        <div class="container">
+            <h1>Checkout</h1>
+            <p>Enter your delivery details and complete payment</p>
+        </div>
+    </section>
+
+    <section class="section check-section" style="padding-top:40px;">
+        <div class="container">
+            <div class="checkout-layout">
+                <form class="checkout-form" id="checkoutForm">
+                    <h3>Delivery Details</h3>
+                    <div class="form-group">
+                        <input type="text" id="cname" name="name" required placeholder=" ">
+                        <label for="cname">Full Name</label>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="tel" id="cphone" name="phone" required placeholder=" " pattern="[0-9]{10}">
+                            <label for="cphone">Phone Number</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="cemail" name="email" required placeholder=" ">
+                            <label for="cemail">Email</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="caddress" name="address" rows="2" required placeholder=" "></textarea>
+                        <label for="caddress">Delivery Address</label>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="ccity" name="city" required placeholder=" ">
+                            <label for="ccity">City</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="cpincode" name="pincode" required placeholder=" " pattern="[0-9]{6}">
+                            <label for="cpincode">PIN Code</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <select id="cstate" name="state" required>
+                            <option value="" disabled selected></option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <label for="cstate">State</label>
+                    </div>
+
+                    <div class="payment-methods">
+                        <h4>Payment Method</h4>
+                        <div class="pay-method selected" data-method="paytm">
+                            <i class="fas fa-wallet"></i>
+                            <div>
+                                <strong>Paytm / UPI / Cards</strong>
+                                <div style="font-size:0.8rem;color:#94a3b8;">Secure online payment via Paytm</div>
+                            </div>
+                        </div>
+                        <div class="pay-method" data-method="cod">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div>
+                                <strong>Cash on Delivery</strong>
+                                <div style="font-size:0.8rem;color:#94a3b8;">Pay when you receive your order</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="placeOrderBtn">
+                        <span>Place Order</span> <i class="fas fa-lock"></i>
+                    </button>
+                </form>
+
+                <div class="checkout-summary">
+                    <h3>Order Summary</h3>
+                    <ul class="summary-items" id="checkoutItems"></ul>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="cSubtotal">₹0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span id="cShipping">₹0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="cTotal">₹0</span>
+                    </div>
+                    <div id="paytmCheckout"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom" style="border:none;">
+                <p>&copy; 2026 Organic Pesticide - Krishna Worldwide. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Paytm JS Checkout SDK (inject at runtime) -->
+    <script src="js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = Cart.get();
+            if (items.length === 0) {
+                window.location.href = 'cart.html';
+                return;
+            }
+            renderSummary(items);
+            Cart.updateCartUI();
+
+            // hamburger
+            document.getElementById('hamburger').addEventListener('click', () => {
+                document.getElementById('navLinks').classList.toggle('active');
+            });
+
+            // payment method selection
+            document.querySelectorAll('.pay-method').forEach(el => {
+                el.addEventListener('click', () => {
+                    document.querySelectorAll('.pay-method').forEach(e => e.classList.remove('selected'));
+                    el.classList.add('selected');
+                });
+            });
+        });
+
+        function renderSummary(items) {
+            const list = document.getElementById('checkoutItems');
+            list.innerHTML = items.map(i => `
+                <li><span>${i.name} × ${i.qty}</span><span>₹${i.price * i.qty}</span></li>
+            `).join('');
+
+            document.getElementById('cSubtotal').textContent = '₹' + Cart.subtotal();
+            const s = Cart.shipping();
+            document.getElementById('cShipping').textContent = s === 0 ? 'FREE' : '₹' + s;
+            document.getElementById('cTotal').textContent = '₹' + Cart.total();
+        }
+
+        // Checkout form submit
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('placeOrderBtn');
+            btn.disabled = true;
+
+            const form = e.target;
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                btn.disabled = false;
+                return;
+            }
+
+            const customer = {
+                name: document.getElementById('cname').value.trim(),
+                phone: document.getElementById('cphone').value.trim(),
+                email: document.getElementById('cemail').value.trim(),
+                address: document.getElementById('caddress').value.trim(),
+                city: document.getElementById('ccity').value.trim(),
+                state: document.getElementById('cstate').value,
+                pincode: document.getElementById('cpincode').value.trim()
+            };
+
+            const items = Cart.get().map(i => ({
+                id: i.id, name: i.name, qty: i.qty, price: i.price
+            }));
+
+            const selectedMethod = document.querySelector('.pay-method.selected').dataset.method;
+
+            try {
+                // 1. Create order on server
+                const orderRes = await fetch('backend/api/order.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customer, items })
+                });
+                const orderData = await orderRes.json();
+
+                if (!orderData.success) {
+                    showNote(orderData.message || 'Order failed', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+
+                const orderId = orderData.order_id;
+
+                if (selectedMethod === 'cod') {
+                    // COD - just confirm
+                    Cart.clear();
+                    showNote('Order placed! Pay on delivery.', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'thankyou.html?order=' + orderId + '&status=cod';
+                    }, 1200);
+                    return;
+                }
+
+                // 2. Paytm payment
+                await startPaytm(orderId);
+            } catch (err) {
+                console.error(err);
+                showNote('Something went wrong. Please try again.', 'error');
+                btn.disabled = false;
+            }
+        });
+
+        async function startPaytm(orderId) {
+            showNote('Connecting to Paytm...', 'info');
+
+            // Get transaction token from server
+            const res = await fetch('backend/paytm/initiate.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_id: orderId })
+            });
+            const data = await res.json();
+
+            if (!data.success) {
+                showNote(data.message || 'Paytm initiation failed', 'error');
+                document.getElementById('placeOrderBtn').disabled = false;
+                return;
+            }
+
+            // Load Paytm JS Checkout SDK
+            const sdkScript = document.createElement('script');
+            sdkScript.src = 'https://securegw-stage.paytm.in/merchantpgpui/checkoutjs/merchants/' + data.mid + '.js';
+            sdkScript.onload = function () {
+                if (window.Paytm && window.Paytm.CheckoutJS) {
+                    window.Paytm.CheckoutJS.init({
+                        "root": "paytmCheckout",
+                        "flow": "DEFAULT",
+                        "data": {
+                            "orderId": data.order_id,
+                            "token": data.txn_token,
+                            "tokenType": "TXN_TOKEN",
+                            "amount": String(data.amount)
+                        },
+                        "handler": {
+                            "notifyMerchant": function (eventName, data) { },
+                            "transactionStatus": function (txnStatus) {
+                                if (txnStatus === 'TXN_SUCCESS') {
+                                    Cart.clear();
+                                    window.location.href = 'thankyou.html?order=' + orderId + '&status=success';
+                                } else {
+                                    window.location.href = 'thankyou.html?order=' + orderId + '&status=failed';
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    showNote('Paytm SDK failed to load. Try again.', 'error');
+                    document.getElementById('placeOrderBtn').disabled = false;
+                }
+            };
+            sdkScript.onerror = function () {
+                // Fallback to redirect flow
+                showNote('Opening Paytm in new window...', 'info');
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = data.transaction_url;
+                form.target = '_blank';
+                form.innerHTML = '<input type="hidden" name="mid" value="' + data.mid + '">' +
+                    '<input type="hidden" name="orderId" value="' + data.order_id + '">' +
+                    '<input type="hidden" name="token" value="' + data.txn_token + '">' +
+                    '<input type="hidden" name="tokenType" value="TXN_TOKEN">' +
+                    '<input type="hidden" name="amount" value="' + data.amount + '">' +
+                    '<input type="hidden" name="websiteName" value="WEBSTAGING">' +
+                    '<input type="hidden" name="callbackUrl" value="' + data.callback_url + '">';
+                document.body.appendChild(form);
+                form.submit();
+                document.getElementById('placeOrderBtn').disabled = false;
+            };
+            document.head.appendChild(sdkScript);
+        }
+
+        function showNote(msg, type) {
+            const el = document.createElement('div');
+            el.className = 'notification';
+            el.style.background = type === 'error' ? '#ef4444' : type === 'success' ? '#22c55e' : '#3b82f6';
+            el.innerHTML = '<i class="fas ' + (type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle') + '"></i><span>' + msg + '</span>';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
