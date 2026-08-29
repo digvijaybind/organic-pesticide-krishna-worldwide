@@ -1,5 +1,5 @@
 # ============================================================
-#  ORGANIC PESTICIDE - BACKEND PROTECTION (Apache)
+#  ORGANIC PESTICIDE - BACKEND PROTECTION (Apache 2.4)
 #  Security rules for the /backend directory.
 #
 #  Best practice:
@@ -9,24 +9,28 @@
 
 Options -Indexes
 
-# Block direct access to sensitive subdirectories
+# ---- Block direct access to sensitive subdirectories (mod_rewrite, reliable) ----
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^(config|orders|logs)/ - [F,L]
 </IfModule>
 
-# Deny access to dotfiles (like .htaccess itself)
+# ---- Deny access to dotfiles (e.g. .htaccess) - Apache 2.4 ----
 <FilesMatch "^\.">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
 
-# Deny direct access to the Paytm library class (only included via require)
-<Files "Paytm.class.php">
+# ---- Deny direct access to internal PHP library files ----
+# (These are only ever included server-side via require(), never served.)
+<FilesMatch "^(Paytm\.class|razorpay-curl)\.php$">
+    Require all denied
+</FilesMatch>
+
+# ---- Legacy fallback for Apache 2.2 (harmless on 2.4) ----
+<IfModule !mod_authz_core.c>
     Order allow,deny
     Deny from all
-</Files>
+</IfModule>
 
-# Note: api/*.php and paytm/*.php endpoints remain accessible as normal
-# because they are entry points reached via HTTP. The class and config
-# files are protected above.
+# Note: api/*.php, paytm/*.php and razorpay/*.php endpoint entry points
+# remain reachable via HTTP as intended; internal classes/config are blocked.

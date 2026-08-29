@@ -24,6 +24,14 @@ $checksum = isset($paytmParams['CHECKSUMHASH']) ? $paytmParams['CHECKSUMHASH'] :
 $orderId = isset($paytmParams['ORDERID']) ? $paytmParams['ORDERID'] : '';
 $txnStatus = isset($paytmParams['STATUS']) ? $paytmParams['STATUS'] : '';
 $txnId = isset($paytmParams['TXNID']) ? $paytmParams['TXNID'] : '';
+$txnAmount = isset($paytmParams['TXNAMOUNT']) ? (float)$paytmParams['TXNAMOUNT'] : 0.0;
+
+// Strict format validation to prevent path traversal.
+if (!preg_match('/^OP\d{17}$/', $orderId) || basename($orderId) !== $orderId) {
+    log_msg('Paytm callback with invalid order id suppressed', 'error');
+    header('Location: ../../checkout.html?status=failed&reason=invalid_order');
+    exit;
+}
 
 $paytm = new Paytm();
 $verified = $paytm->verifyChecksum($paytmParams, $checksum);
@@ -39,7 +47,18 @@ $orderFile = ORDERS_DIR . '/' . $orderId . '.json';
 if (file_exists($orderFile)) {
     $order = json_decode(file_get_contents($orderFile), true);
     if ($txnStatus === 'TXN_SUCCESS') {
+        // Anti-tamper: verify the paid amount matches the order total.
+        $expected = (float) ($order['total'] ?? 0);
+        if (abs($txnAmount - $expected) > 0.01) {
+            log_msg("Paytm AMOUNT MISMATCH for $orderId expected=$expected paid=$txnAmount", 'error');
+            $order['payment_status'] = 'FAILED';
+            $order['payment_txn_id'] = $txnId;
+            file_put_contents($orderFile, json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            header('Location: ../../thankyou.html?order=' . urlencode($orderId) . '&status=failed&reason=amount');
+            exit;
+        }
         $order['payment_status'] = 'PAID';
+        $order['payment_method'] = 'paytm';
         $order['payment_txn_id'] = $txnId;
         log_msg("Payment SUCCESS for $orderId txn=$txnId");
     } else {
@@ -48,6 +67,7 @@ if (file_exists($orderFile)) {
         log_msg("Payment FAILED for $orderId status=$txnStatus");
     }
     file_put_contents($orderFile, json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($orderFile, 0600);
 }
 
 // Redirect customer to order status page

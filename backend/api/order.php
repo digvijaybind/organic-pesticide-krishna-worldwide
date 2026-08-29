@@ -47,11 +47,24 @@ if (!$data) {
     exit;
 }
 
+// Same-origin guard (best effort CSRF protection)
+$reqOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$reqHost = $_SERVER['HTTP_HOST'] ?? '';
+$allowedHost = getenv('APP_HOST') ?: $reqHost;
+if ($reqOrigin !== '') {
+    $originHost = parse_url($reqOrigin, PHP_URL_HOST);
+    if ($originHost && $originHost !== $reqHost && $originHost !== $allowedHost) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Origin not allowed']);
+        exit;
+    }
+}
+
 // --- Validation ---
 $customer = isset($data['customer']) ? $data['customer'] : null;
 $items = isset($data['items']) ? $data['items'] : [];
 
-if (!$customer || empty($items)) {
+if (!is_array($customer) || !is_array($items) || empty($items)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Customer and items are required']);
     exit;
@@ -59,7 +72,7 @@ if (!$customer || empty($items)) {
 
 $names = ['name','phone','email','address','city','state','pincode'];
 foreach ($names as $field) {
-    if (empty($customer[$field])) {
+    if (!isset($customer[$field]) || trim((string)$customer[$field]) === '') {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => "Missing field: $field"]);
         exit;
@@ -67,34 +80,69 @@ foreach ($names as $field) {
 }
 
 // Validate phone (10 digits)
-if (!preg_match('/^[0-9]{10}$/', preg_replace('/\D/', '', $customer['phone']))) {
+$phone = preg_replace('/\D/', '', (string)$customer['phone']);
+if (!preg_match('/^[0-9]{10}$/', $phone)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid phone number']);
     exit;
+}
+
+// Validate email
+$email = strtolower(trim((string)$customer['email']));
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Invalid email address']);
+    exit;
+}
+
+// Validate pincode (6 digits)
+if (!preg_match('/^\d{6}$/', trim((string)$customer['pincode']))) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Invalid pincode']);
+    exit;
+}
+
+// Cap field lengths
+$maxLen = ['name' => 120, 'address' => 300, 'city' => 60, 'state' => 60];
+foreach ($maxLen as $f => $len) {
+    if (mb_strlen((string)$customer[$f]) > $len) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => ucfirst($f) . ' is too long']);
+        exit;
+    }
 }
 
 // --- Compute & verify totals server-side (never trust the client) ---
 $products = require __DIR__ . '/../config/products.php';
 $priceMap = [];
 foreach ($products as $p) {
-    $priceMap[$p['id']] = $p['price'];
+    $priceMap[$p['id']] = $p; // keep full product (price + canonical name)
 }
 
 $subtotal = 0;
 $lineItems = [];
+$paymentMethod = ($data['payment_method'] ?? '') === 'paytm' ? 'paytm' : (($data['payment_method'] ?? '') === 'razorpay' ? 'razorpay' : 'cod');
 foreach ($items as $item) {
-    $pid = $item['id'];
-    $qty = max(1, (int)$item['qty']);
+    if (!is_array($item) || !isset($item['id'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid item data']);
+        exit;
+    }
+    $pid = (string)$item['id'];
+    $qty = isset($item['qty']) ? (int)$item['qty'] : 1;
+    $qty = max(1, min(50, $qty)); // sanity cap
     if (!isset($priceMap[$pid])) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => "Unknown product: $pid"]);
         exit;
     }
-    $price = $priceMap[$pid];
+    $product = $priceMap[$pid];
+    $price = (int) $product['price'];
     $subtotal += $price * $qty;
+    // Use the SERVER's canonical product name (never trust client "name").
     $lineItems[] = [
         'id' => $pid,
-        'name' => $item['name'],
+        'name' => $product['name'],
         'qty' => $qty,
         'price' => $price,
         'line_total' => $price * $qty
@@ -104,31 +152,37 @@ foreach ($items as $item) {
 $shipping = ($subtotal >= FREE_SHIPPING_THRESHOLD) ? 0 : SHIPPING_FEE;
 $total = $subtotal + $shipping;
 
-// --- Create order ---
-$orderId = 'OP' . date('YmdHis') . rand(100, 999);
+// --- Create order (format: OP + 14-digit timestamp + 3-digit suffix = 17 digits) ---
+$timestamp = date('YmdHis');
+do {
+    $orderId = 'OP' . $timestamp . str_pad(mt_rand(0, 999), 3, '0', STR_PAD_LEFT);
+} while (file_exists(ORDERS_DIR . '/' . $orderId . '.json'));
+
 $order = [
     'order_id' => $orderId,
     'created_at' => date('Y-m-d H:i:s'),
     'customer' => [
-        'name' => $customer['name'],
-        'phone' => $customer['phone'],
-        'email' => $customer['email'],
-        'address' => $customer['address'],
-        'city' => $customer['city'],
-        'state' => $customer['state'],
-        'pincode' => $customer['pincode']
+        'name' => trim((string)$customer['name']),
+        'phone' => $phone,
+        'email' => $email,
+        'address' => trim((string)$customer['address']),
+        'city' => trim((string)$customer['city']),
+        'state' => trim((string)$customer['state']),
+        'pincode' => trim((string)$customer['pincode'])
     ],
     'items' => $lineItems,
     'subtotal' => $subtotal,
     'shipping' => $shipping,
     'total' => $total,
-    'payment_status' => 'PENDING',   // 'PENDING' | 'PAID' | 'FAILED'
+    'payment_method' => $paymentMethod,        // 'razorpay' | 'paytm' | 'cod'
+    'payment_status' => 'PENDING',           // 'PENDING' | 'PAID' | 'FAILED'
     'payment_txn_id' => ''
 ];
 
 // Save order as JSON file (simple file storage; use MySQL in production)
 $file = ORDERS_DIR . '/' . $orderId . '.json';
 $saved = file_put_contents($file, json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+if ($saved !== false) { @chmod($file, 0600); }
 
 if ($saved === false) {
     http_response_code(500);

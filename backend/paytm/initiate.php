@@ -18,13 +18,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Same-origin guard (best effort)
+$reqOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$reqHost = $_SERVER['HTTP_HOST'] ?? '';
+if ($reqOrigin !== '') {
+    $originHost = parse_url($reqOrigin, PHP_URL_HOST);
+    if ($originHost && $originHost !== $reqHost) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Origin not allowed']);
+        exit;
+    }
+}
+
 $raw = file_get_contents('php://input');
 $data = json_decode($raw, true);
 $orderId = isset($data['order_id']) ? trim($data['order_id']) : '';
 
-if ($orderId === '') {
+// Strict format validation to prevent path traversal
+if (!preg_match('/^OP\d{17}$/', $orderId) || basename($orderId) !== $orderId) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'order_id required']);
+    echo json_encode(['success' => false, 'message' => 'Invalid order id']);
     exit;
 }
 
@@ -36,6 +49,12 @@ if (!file_exists($orderFile)) {
     exit;
 }
 $order = json_decode(file_get_contents($orderFile), true);
+
+if (($order['payment_status'] ?? '') !== 'PENDING') {
+    http_response_code(409);
+    echo json_encode(['success' => false, 'message' => 'Order is not pending']);
+    exit;
+}
 
 $paytm = new Paytm();
 $amount = $order['total'];

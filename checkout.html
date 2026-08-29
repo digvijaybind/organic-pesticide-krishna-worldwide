@@ -89,8 +89,15 @@
 
                     <div class="payment-methods">
                         <h4>Payment Method</h4>
-                        <div class="pay-method selected" data-method="paytm">
+                        <div class="pay-method selected" data-method="razorpay">
                             <i class="fas fa-wallet"></i>
+                            <div>
+                                <strong>Razorpay (UPI / Cards / NetBanking / Wallet)</strong>
+                                <div style="font-size:0.8rem;color:#94a3b8;">Secure online payment via Razorpay</div>
+                            </div>
+                        </div>
+                        <div class="pay-method" data-method="paytm">
+                            <i class="fas fa-mobile-alt"></i>
                             <div>
                                 <strong>Paytm / UPI / Cards</strong>
                                 <div style="font-size:0.8rem;color:#94a3b8;">Secure online payment via Paytm</div>
@@ -209,7 +216,7 @@
             // ---- Order data payload (used by both server & local fallback) ----
             const subtotal = Cart.subtotal();
             const shippingFee = Cart.shipping();
-            const payload = { customer, items, subtotal, shipping: shippingFee, total: subtotal + shippingFee };
+            const payload = { customer, items, subtotal, shipping: shippingFee, total: subtotal + shippingFee, payment_method: selectedMethod };
 
             let orderData = null;
 
@@ -218,7 +225,7 @@
                 const orderRes = await fetch('backend/api/order.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ customer, items })
+                    body: JSON.stringify({ customer, items, payment_method: selectedMethod })
                 });
                 const json = await orderRes.json();
                 if (json && json.success && json.order_id) {
@@ -244,7 +251,13 @@
                 return;
             }
 
-            // ---- 2. Paytm payment (needs the PHP backend + live keys) ----
+            if (selectedMethod === 'razorpay') {
+                // ---- Primary gateway: Razorpay ----
+                await startRazorpay(orderId, customer);
+                return;
+            }
+
+            // ---- Fallback gateway: Paytm ----
             await startPaytm(orderId);
         });
 
@@ -270,6 +283,99 @@
             return order;
         }
 
+        async function startRazorpay(orderId, customer) {
+            showNote('Setting up payment...', 'info');
+
+            // 1. Create the Razorpay order server-side
+            let rzp;
+            try {
+                const res = await fetch('backend/razorpay/createOrder.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId })
+                });
+                rzp = await res.json();
+            } catch (err) {
+                gPOCUnavailable(orderId);
+                return;
+            }
+
+            if (!rzp || !rzp.success) {
+                gPOCUnavailable(orderId, rzp && rzp.message);
+                return;
+            }
+
+            // 2. Load/use the Razorpay Checkout SDK
+            const options = {
+                key: rzp.key_id,
+                amount: rzp.amount_paise,   // paise
+                currency: 'INR',
+                name: 'Organic Pesticide - Krishna Worldwide',
+                description: 'Order ' + rzp.order_id,
+                order_id: rzp.razorpay_order_id,
+                prefill: {
+                    name: customer.name,
+                    email: customer.email,
+                    contact: customer.phone
+                },
+                notes: { order_id: rzp.order_id },
+                theme: { color: '#16a34a' },
+                handler: function (response) {
+                    // Redirect to the SERVER verification endpoint with the payment_id.
+                    // Server confirms status + amount before marking PAID.
+                    window.location.href = rzp.callback_url +
+                        '?order_id=' + encodeURIComponent(rzp.order_id) +
+                        '&payment_id=' + encodeURIComponent(response.razorpay_payment_id);
+                },
+                modal: {
+                    ondismiss: function () {
+                        document.getElementById('placeOrderBtn').disabled = false;
+                        showNote('Payment window closed. You can retry or choose Cash on Delivery.', 'info');
+                    }
+                }
+            };
+
+            try {
+                const rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function (resp) {
+                    window.location.href = 'thankyou.html?order=' + encodeURIComponent(rzp.order_id) + '&status=failed';
+                });
+                rzp1.open();
+            } catch (err) {
+                // SDK not loaded yet - load it then retry
+                loadRazorpaySDK(function () {
+                    try {
+                        const rzp2 = new Razorpay(options);
+                        rzp2.open();
+                    } catch (e2) {
+                        gPOCUnavailable(orderId, 'Razorpay could not be loaded');
+                    }
+                });
+            }
+        }
+
+        function loadRazorpaySDK(done) {
+            if (window.Razorpay) { done(); return; }
+            const s = document.createElement('script');
+            s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            s.onload = function () { done(); };
+            s.onerror = function () { showNote('Could not load payment SDK. Try again.', 'error'); document.getElementById('placeOrderBtn').disabled = false; };
+            document.body.appendChild(s);
+        }
+
+        // Gateway unavailable helper (shared: Paytm fallback shows this too).
+        function gPOCUnavailable(orderId, backendMsg) {
+            showNote(
+                (backendMsg ? backendMsg + ' ' : '') +
+                'Online payment is not available right now. Please select Cash on Delivery.',
+                'error'
+            );
+            document.getElementById('placeOrderBtn').disabled = false;
+            document.querySelectorAll('.pay-method').forEach(e => e.classList.remove('selected'));
+            const cod = document.querySelector('.pay-method[data-method="cod"]');
+            if (cod) cod.classList.add('selected');
+        }
+
         async function startPaytm(orderId) {
             showNote('Connecting to payment gateway...', 'info');
 
@@ -284,12 +390,12 @@
                 data = await res.json();
             } catch (err) {
                 // PHP backend not running (static hosting POC) => gateway unavailable
-                pMOCUnavailable(orderId);
+                gPOCUnavailable(orderId);
                 return;
             }
 
             if (!data || !data.success) {
-                pMOCUnavailable(orderId, data && data.message);
+                gPOCUnavailable(orderId, data && data.message);
                 return;
             }
 
@@ -343,21 +449,6 @@
                 document.getElementById('placeOrderBtn').disabled = false;
             };
             document.head.appendChild(sdkScript);
-        }
-
-        // Paytm gateway is not available (PHP backend not running on this host, or not configured).
-        // For the POC we show a clear message and let the customer choose COD so the flow completes.
-        function pMOCUnavailable(orderId, backendMsg) {
-            showNote(
-                (backendMsg ? backendMsg + ' ' : '') +
-                'Online payment needs the live PHP hosting. Please select Cash on Delivery.',
-                'error'
-            );
-            document.getElementById('placeOrderBtn').disabled = false;
-            // Automatically highlight COD so the demo can move forward
-            document.querySelectorAll('.pay-method').forEach(e => e.classList.remove('selected'));
-            const cod = document.querySelector('.pay-method[data-method="cod"]');
-            if (cod) cod.classList.add('selected');
         }
 
         function showNote(msg, type) {

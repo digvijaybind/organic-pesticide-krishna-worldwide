@@ -5,21 +5,27 @@
  *  Backend Configuration
  * ============================================================
  *  IMPORTANT SECURITY NOTE:
- *  This file contains sensitive configuration (Paytm keys, DB creds).
+ *  This file holds SENSITIVE configuration (payment keys).
  *  NEVER expose this file to the web directly.
- *  Ensure it lives OUTSIDE your public_html web root, OR
- *  protect it with .htaccess (deny all).
  *
- *  For shared hosting (cPanel), the recommended location is
- *  one level ABOVE public_html, e.g.:
- *      home/username/config/config.php
- *  and reference it from public_html/backend via relative path.
+ *  RECOMMENDED LAYOUT (cPanel):
+ *   - Keep this file OUTSIDE the public web root (e.g. one level
+ *     above public_html) and include it via an absolute path, OR
+ *   - Keep it where it is but rely on the backend/.htaccess to
+ *     block direct access, AND
+ *   - Store the REAL LIVE keys as environment variables, never
+ *     hardcoded in this file. See "payment keys" below.
+ *
+ *  Payment keys are read from environment variables so that LIVE
+ *  keys never live in source code or in any web-served file.
  * ============================================================
  */
 
-// --- Error reporting (disable in production) ---
+// --- Error reporting (disable display in production) ---
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+$isDev = (getenv('APP_ENV') === 'dev');
+ini_set('display_errors', $isDev ? '1' : '0');
 
 // --- Store settings (used across the site) ---
 define('STORE_NAME', 'Organic Pesticide - Krishna Worldwide');
@@ -31,74 +37,84 @@ define('SHIPPING_FEE', 49);                       // flat shipping fee below thr
 
 // --- Paths ---
 // config.php lives at <webroot>/backend/config/config.php
-// so the website root is TWO levels up.
+// so the website root is TWO levels up. If you MOVE this file outside
+// public_html, adjust BASE_DIR accordingly (e.g. __DIR__ when placed
+// at /home/user/config/config.php).
 define('BASE_DIR', __DIR__ . '/../..');           // root of website
-define('ORDERS_DIR', BASE_DIR . '/backend/orders');
-define('LOG_DIR', BASE_DIR . '/backend/logs');
+
+// Orders/logs can be placed ABOVE the web root via env for extra safety,
+// defaulting to inside the site when not set.
+$ordersOverride = getenv('ORDERS_DIR');
+$logsOverride = getenv('LOGS_DIR');
+define('ORDERS_DIR', $ordersOverride ?: (BASE_DIR . '/backend/orders'));
+define('LOG_DIR', $logsOverride ?: (BASE_DIR . '/backend/logs'));
 
 // Ensure directories exist
-if (!is_dir(ORDERS_DIR)) { @mkdir(ORDERS_DIR, 0755, true); }
-if (!is_dir(LOG_DIR)) { @mkdir(LOG_DIR, 0755, true); }
-
-/* ============================================================
- *  PAYTM PAYMENT GATEWAY CONFIGURATION
- * ============================================================
- *  !! CRITICAL SECURITY !!
- *  These keys are used ONLY on the SERVER side.
- *  They MUST NEVER appear in any HTML/JS/CSS file served to the
- *  browser, or anyone can steal your merchant key.
- *
- *  For testing, Paytm provides separate TEST credentials.
- *  NEVER put your LIVE merchant key here until you have moved
- *  this file OUTSIDE the public web root.
- *
- *  How to get TEST credentials:
- *  - Log into Paytm dashboard -> "Dashboard" -> "Keys & Certificates"
- *  - Use the TEST Merchant ID & TEST Merchant Key
- *  - Paytm currently offers a "Paytm PG" sandbox at:
- *      https://business.paytm.com/ (developers section)
- *
- *  ----- PAYTM ENV SELECTION -----
- *  Set PAYTM_ENV to 'TEST' while developing, 'PROD' when live.
- *  ============================================================
- */
-
-define('PAYTM_ENV', 'TEST');   // 'TEST' or 'PROD'
-
-if (PAYTM_ENV === 'TEST') {
-    // --- TEST / STAGING credentials (safe to show) ---
-    // Replace these with your real TEST merchant details from Paytm dashboard.
-    define('PAYTM_MERCHANT_ID', 'YOUR_TEST_MERCHANT_ID');
-    define('PAYTM_MERCHANT_KEY', 'YOUR_TEST_MERCHANT_KEY');
-    define('PAYTM_WEBSITE', 'WEBSTAGING');
-    define('PAYTM_TRANSACTION_URL', 'https://securegw-stage.paytm.in/theia/processTransaction');
-    define('PAYTM_INITIATE_URL', 'https://securegw-stage.paytm.in/theia/api/v1/initiateTransaction?mid=YOUR_TEST_MERCHANT_ID&orderId=ORDERID');
-    define('PAYTM_CALLBACK_URL', 'http://localhost/paytm/paytm-response.php'); // update for production
-} else {
-    // --- PRODUCTION / LIVE credentials (DO NOT commit these) ---
-    // When going live, replace these with your LIVE keys.
-    // IMPORTANT: fill these in on the server, NOT in your git repo.
-    define('PAYTM_MERCHANT_ID', 'PASTE_LIVE_MERCHANT_ID_HERE');
-    define('PAYTM_MERCHANT_KEY', 'PASTE_LIVE_MERCHANT_KEY_HERE');
-    define('PAYTM_WEBSITE', 'DEFAULT');
-    define('PAYTM_TRANSACTION_URL', 'https://securegw.paytm.in/theia/processTransaction');
-    define('PAYTM_INITIATE_URL', 'https://securegw.paytm.in/theia/api/v1/initiateTransaction?mid=PASTE_LIVE_MERCHANT_ID_HERE&orderId=ORDERID');
-    define('PAYTM_CALLBACK_URL', 'https://organicpesticide.yourdomain.com/backend/paytm/paytm-response.php');
+foreach ([ORDERS_DIR, LOG_DIR] as $d) {
+    if (!is_dir($d)) { @mkdir($d, 0755, true); }
 }
 
-// CORS / settings
-header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+/* ============================================================
+ *  RAZORPAY PAYMENT GATEWAY (PRIMARY)
+ * ============================================================
+ *  Keys are read from environment variables so they are never
+ *  committed or exposed to the browser.
+ *
+ *  cPanel: set these in the account/domain "Environment Variables"
+ *   - RAZORPAY_ENV       = test | live
+ *   - RAZORPAY_KEY_ID    = your Key ID
+ *   - RAZORPAY_KEY_SECRET= your Key Secret
+ *
+ *  Modes:
+ *   test => https://api.razorpay.com  (test keys)
+ *   live => https://api.razorpay.com  (live keys)
+ * ============================================================
+ */
+define('RAZORPAY_ENV', strtolower(getenv('RAZORPAY_ENV') ?: 'test')); // 'test' or 'live'
+define('RAZORPAY_KEY_ID', getenv('RAZORPAY_KEY_ID') ?: 'YOUR_RAZORPAY_KEY_ID');
+define('RAZORPAY_KEY_SECRET', getenv('RAZORPAY_KEY_SECRET') ?: 'YOUR_RAZORPAY_KEY_SECRET');
+define('RAZORPAY_API_URL', 'https://api.razorpay.com/v1');
+define('RAZORPAY_CALLBACK_URL', getenv('RAZORPAY_CALLBACK_URL') ?: 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/backend/razorpay/verify.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
+// Fail fast if we are in LIVE mode but no real keys are set.
+if (RAZORPAY_ENV === 'live') {
+    $bogusLive = (RAZORPAY_KEY_ID === 'YOUR_RAZORPAY_KEY_ID' || RAZORPAY_KEY_SECRET === 'YOUR_RAZORPAY_KEY_SECRET');
+    if ($bogusLive) {
+        http_response_code(500);
+        exit('RAZORPAY_ENV=live but keys are not configured in environment variables');
+    }
+}
+
+/* ============================================================
+ *  PAYTM PAYMENT GATEWAY (FALLBACK / SECONDARY)
+ * ============================================================
+ *  ALSO read from environment variables (server-side only).
+ *   - PAYTM_ENV         = TEST | PROD
+ *   - PAYTM_MERCHANT_ID
+ *   - PAYTM_MERCHANT_KEY
+ * ============================================================
+ */
+define('PAYTM_ENV', strtoupper(getenv('PAYTM_ENV') ?: 'TEST'));   // 'TEST' or 'PROD'
+
+if (PAYTM_ENV === 'TEST') {
+    define('PAYTM_MERCHANT_ID', getenv('PAYTM_MERCHANT_ID') ?: 'YOUR_TEST_MERCHANT_ID');
+    define('PAYTM_MERCHANT_KEY', getenv('PAYTM_MERCHANT_KEY') ?: 'YOUR_TEST_MERCHANT_KEY');
+    define('PAYTM_WEBSITE', 'WEBSTAGING');
+    define('PAYTM_TRANSACTION_URL', 'https://securegw-stage.paytm.in/theia/processTransaction');
+    define('PAYTM_INITIATE_URL', 'https://securegw-stage.paytm.in/theia/api/v1/initiateTransaction?mid=' . (getenv('PAYTM_MERCHANT_ID') ?: 'YOUR_TEST_MERCHANT_ID') . '&orderId=ORDERID');
+    define('PAYTM_CALLBACK_URL', getenv('PAYTM_CALLBACK_URL') ?: 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/backend/paytm/paytm-response.php');
+} else {
+    define('PAYTM_MERCHANT_ID', getenv('PAYTM_MERCHANT_ID') ?: 'PASTE_LIVE_MERCHANT_ID_HERE');
+    define('PAYTM_MERCHANT_KEY', getenv('PAYTM_MERCHANT_KEY') ?: 'PASTE_LIVE_MERCHANT_KEY_HERE');
+    define('PAYTM_WEBSITE', 'DEFAULT');
+    define('PAYTM_TRANSACTION_URL', 'https://securegw.paytm.in/theia/processTransaction');
+    define('PAYTM_INITIATE_URL', 'https://securegw.paytm.in/theia/api/v1/initiateTransaction?mid=' . (getenv('PAYTM_MERCHANT_ID') ?: 'PASTE_LIVE_MERCHANT_ID_HERE') . '&orderId=ORDERID');
+    define('PAYTM_CALLBACK_URL', getenv('PAYTM_CALLBACK_URL') ?: 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/backend/paytm/paytm-response.php');
 }
 
 // --- Simple logger ---
 function log_msg($message, $type = 'info') {
+    if (!defined('LOG_DIR')) return;
     $line = '[' . date('Y-m-d H:i:s') . "] [$type] " . $message . PHP_EOL;
     @file_put_contents(LOG_DIR . '/app.log', $line, FILE_APPEND);
 }
