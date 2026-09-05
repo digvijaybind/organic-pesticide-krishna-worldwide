@@ -1,0 +1,29 @@
+# ============================================================
+#  ORGANIC PESTICIDE - ROOT PROTECTION (Apache 2.4)
+#  Defense-in-depth rules for the public web root.
+#  NOTE: Sensitive files should live OUTSIDE this directory.
+# ============================================================
+
+Options -Indexes
+
+# ---- Deny dotfiles (.env, .htaccess, .git, etc.) ----
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# ---- Deny the .env config file explicitly (in-case it's placed here) ----
+<FilesMatch "^\.env.*">
+    Require all denied
+</FilesMatch>
+
+# ---- Block direct access to backend sensitive dirs via root ----
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^backend/(config|orders|logs)/ - [F,L]
+</IfModule>
+
+# ---- Legacy fallback for Apache 2.2 (harmless on 2.4) ----
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

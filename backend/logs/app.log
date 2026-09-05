@@ -1,0 +1,3 @@
+[2026-09-03 07:15:58] [info] Order created: OP20260903071558036 total=598
+[2026-09-03 07:16:02] [error] Cashfree create order failed: Curl error: SSL certificate OpenSSL verify result: self-signed certificate in certificate chain (19)
+[2026-09-03 07:16:03] [error] Razorpay create order failed: Curl error: SSL certificate OpenSSL verify result: self-signed certificate in certificate chain (19)

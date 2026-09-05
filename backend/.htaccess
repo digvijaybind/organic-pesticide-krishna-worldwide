@@ -22,7 +22,7 @@ Options -Indexes
 
 # ---- Deny direct access to internal PHP library files ----
 # (These are only ever included server-side via require(), never served.)
-<FilesMatch "^(Paytm\.class|razorpay-curl)\.php$">
+<FilesMatch "^(Paytm\.class|razorpay-curl|cashfree-curl|shiprocket-curl|shiprocket-helper)\.php$">
     Require all denied
 </FilesMatch>
 

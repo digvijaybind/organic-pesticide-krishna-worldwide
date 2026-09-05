@@ -55,6 +55,60 @@ foreach ([ORDERS_DIR, LOG_DIR] as $d) {
 }
 
 /* ============================================================
+ *  SECURE .env LOADER (KEY MANAGEMENT)
+ * ============================================================
+ *  Real gateway keys MUST live on the server, never in chat or in
+ *  tracked source files. On cPanel system environment variables are
+ *  often hard to set, so we support an optional .env file placed
+ *  OUTSIDE the web root (recommended: UP ONE level above BASE_DIR).
+ *
+ *  Placement options (checked in order, first existing wins):
+ *    1. <BASE_DIR>/../.env         (outside the site, recommended)
+ *    2. <BASE_DIR>/.env            (inside site - .htaccess blocks it)
+ *
+ *  The loader ONLY calls putenv() for keys that are NOT already real
+ *  system environment variables, so system env vars always win. It
+ *  never outputs any value.
+ * ============================================================
+ */
+(function () {
+    $candidates = [realpath(BASE_DIR . '/../.env'), BASE_DIR . '/.env'];
+    $envFile = null;
+    foreach ($candidates as $c) {
+        if (is_file($c)) { $envFile = $c; break; }
+    }
+    if (!$envFile) { return; }
+
+    $lines = @file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if (!$lines) { return; }
+
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || strpos($line, '#') === 0 || strpos($line, ';') === 0) {
+            continue; // comment
+        }
+        $eq = strpos($line, '=');
+        if ($eq === false) { continue; }
+        $key = trim(substr($line, 0, $eq));
+        $val = trim(substr($line, $eq + 1));
+        // Strip surrounding quotes if present.
+        if (strlen($val) >= 2) {
+            $q = $val[0];
+            if (($q === '"' || $q === "'") && substr($val, -1) === $q) {
+                $val = substr($val, 1, -1);
+            }
+        }
+        $key = strtoupper($key);
+        if ($key === '') { continue; }
+        // Only set if not already a real system env var (system wins).
+        if (getenv($key) === false) {
+            putenv($key . '=' . $val);
+            $_ENV[$key] = $val;
+        }
+    }
+})();
+
+/* ============================================================
  *  RAZORPAY PAYMENT GATEWAY (PRIMARY)
  * ============================================================
  *  Keys are read from environment variables so they are never
@@ -111,6 +165,65 @@ if (PAYTM_ENV === 'TEST') {
     define('PAYTM_INITIATE_URL', 'https://securegw.paytm.in/theia/api/v1/initiateTransaction?mid=' . (getenv('PAYTM_MERCHANT_ID') ?: 'PASTE_LIVE_MERCHANT_ID_HERE') . '&orderId=ORDERID');
     define('PAYTM_CALLBACK_URL', getenv('PAYTM_CALLBACK_URL') ?: 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/backend/paytm/paytm-response.php');
 }
+
+// Fail fast if in PROD but keys are not really configured.
+if (PAYTM_ENV === 'PROD') {
+    $bogus = (PAYTM_MERCHANT_ID === 'PASTE_LIVE_MERCHANT_ID_HERE' || PAYTM_MERCHANT_ID === 'YOUR_TEST_MERCHANT_ID' || PAYTM_MERCHANT_KEY === 'PASTE_LIVE_MERCHANT_KEY_HERE' || PAYTM_MERCHANT_KEY === 'YOUR_TEST_MERCHANT_KEY');
+    if ($bogus) {
+        http_response_code(500);
+        exit('PAYTM_ENV=PROD but a valid merchant key is not configured in environment variables');
+    }
+}
+
+/* ============================================================
+ *  CASHFREE PAYMENT GATEWAY (ADDITIONAL ONLINE OPTION)
+ * ============================================================
+ *  Server-side keys come from environment variables only.
+ *   - CASHFREE_ENV           = test | prod
+ *   - CASHFREE_CLIENT_ID
+ *   - CASHFREE_CLIENT_SECRET
+ *  Callback URL (redirect after payment) configured via env.
+ * ============================================================
+ */
+define('CASHFREE_ENV', strtolower(getenv('CASHFREE_ENV') ?: 'test')); // 'test' or 'prod'
+if (CASHFREE_ENV === 'prod') {
+    define('CASHFREE_API_URL', 'https://api.cashfree.com/pg');
+    define('CASHFREE_CHECKOUT_URL', 'https://sdk.cashfree.com/js/v3/cashfree.js');
+} else {
+    define('CASHFREE_API_URL', 'https://sandbox.cashfree.com/pg');
+    define('CASHFREE_CHECKOUT_URL', 'https://sdk.cashfree.com/js/v3/cashfree.js');
+}
+define('CASHFREE_CLIENT_ID', getenv('CASHFREE_CLIENT_ID') ?: 'YOUR_CASHFREE_CLIENT_ID');
+define('CASHFREE_CLIENT_SECRET', getenv('CASHFREE_CLIENT_SECRET') ?: 'YOUR_CASHFREE_CLIENT_SECRET');
+define('CASHFREE_CALLBACK_URL', getenv('CASHFREE_CALLBACK_URL') ?: 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/backend/cashfree/verify.php');
+
+// Fail fast if in prod but keys are not really configured.
+if (CASHFREE_ENV === 'prod') {
+    $bogusCf = (CASHFREE_CLIENT_ID === 'YOUR_CASHFREE_CLIENT_ID' || CASHFREE_CLIENT_SECRET === 'YOUR_CASHFREE_CLIENT_SECRET');
+    if ($bogusCf) {
+        http_response_code(500);
+        exit('CASHFREE_ENV=prod but client credentials are not configured in environment variables');
+    }
+}
+
+/* ============================================================
+ *  SHIPROCKET LOGISTICS (SHIPPING + LABEL + TRACKING)
+ * ============================================================
+ *  Shiprocket authenticates with email + password OR a bearer token.
+ *  The token is cached to disk (backend/orders/.shiprocket_token) and
+ *  refreshed automatically. All credentials come from env vars.
+ *   - SHIPROCKET_EMAIL
+ *   - SHIPROCKET_PASSWORD
+ *  (Prefer setting a STORED token via SHIPROCKET_TOKEN_KEY for the
+ *   production SysOps/Token API; the email/password flow is used if
+ *   no token key is provided.)
+ * ============================================================
+ */
+define('SHIPROCKET_API_URL', getenv('SHIPROCKET_API_URL') ?: 'https://apiv2.shiprocket.in/v1/external');
+define('SHIPROCKET_EMAIL', getenv('SHIPROCKET_EMAIL') ?: '');
+define('SHIPROCKET_PASSWORD', getenv('SHIPROCKET_PASSWORD') ?: '');
+define('SHIPROCKET_TOKEN_KEY', getenv('SHIPROCKET_TOKEN_KEY') ?: '');   // optional persistent token
+define('SHIPROCKET_TOKEN_FILE', (ORDERS_DIR ?: (BASE_DIR . '/backend/orders')) . '/.shiprocket_token');
 
 // --- Simple logger ---
 function log_msg($message, $type = 'info') {

@@ -9,6 +9,22 @@
  * ============================================================
  */
 
+// Fallback image shown when a product photo is missing (branded placeholder).
+// Guarded + `var` so it can coexist with the identical definition in cart.js.
+if (typeof PLACEHOLDER_IMG === 'undefined') {
+    var PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">' +
+        '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#dcfce7"/><stop offset="1" stop-color="#bbf7d0"/>' +
+        '</linearGradient></defs>' +
+        '<rect width="600" height="600" fill="url(#g)"/>' +
+        '<g transform="translate(300,300)"><circle r="120" fill="#ffffff" opacity="0.85"/>' +
+        '<path d="M-70,-40 C-10,-80 50,-60 70,-20 C40,-10 10,-30 -10,-10 L-70,-40 Z M80,-10 C60,50 10,60 -40,40 L20,10 C40,-20 60,-20 80,-10 Z" fill="#16a34a"/>' +
+        '</g></svg>'
+    );
+}
+
+
 const CATALOG = [
     { id: 'cow-dung', name: 'Cow Dung Compost', name_hi: 'गोबर खाद', price: 299, old_price: 399, category: 'fertilizer', image: 'images/1Cow.png', unit: 'bag', short_desc: 'Nutrient-rich organic cow dung manure for all crops.', featured: true },
     { id: 'vermi-compost', name: 'Vermicompost', name_hi: 'वर्मीकम्पोस्ट', price: 375, old_price: 450, category: 'fertilizer', image: 'images/2Vermi.png', unit: 'bag', short_desc: 'Premium earthworm compost rich in NPK and humus.', featured: true },
@@ -18,7 +34,7 @@ const CATALOG = [
     { id: 'bio-gas-fertilizer', name: 'Bio-Gas Slurry Fertilizer', name_hi: 'बायोगैस स्लरी खाद', price: 449, old_price: 0, category: 'biogas', image: 'images/Frame-Compost2.jpg', unit: 'bag', short_desc: 'Nutrient-rich fertilizer from biogas slurry.', featured: true },
     { id: 'compost-blend', name: 'Premium Compost Blend', name_hi: 'प्रीमियम कम्पोस्ट', price: 499, old_price: 599, category: 'fertilizer', image: 'images/Frame-Compost7.jpg', unit: 'bag', short_desc: 'Multi-source compost blend for maximum enrichment.', featured: true },
     { id: 'organic-manure-pack', name: 'Organic Manure Pack', name_hi: 'जैविक खाद पैक', price: 649, old_price: 749, category: 'fertilizer', image: 'images/Frame-Compost9.jpg', unit: 'bundle', short_desc: 'Complete 3-in-1 organic manure bundle.', featured: true },
-    { id: 'growth-promoter', name: 'GrowthVita Bio Stimulant', name_hi: 'ग्रोथविटा बायो', price: 349, old_price: 0, category: 'growth', image: 'images/Jeevaamrut1.jpg', unit: 'bottle', short_desc: 'Bio-stimulant with amino acids & seaweed.', featured: false }
+    { id: 'growth-promoter', name: 'GrowthVita Bio Stimulant', name_hi: 'ग्रोथविटा बायो', price: 349, old_price: 0, category: 'growth', image: 'images/GrowthVita.png', unit: 'bottle', short_desc: 'Bio-stimulant with amino acids & seaweed.', featured: false }
 ];
 
 /**
@@ -80,7 +96,7 @@ async function renderProducts() {
     grid.innerHTML = featured.map((p, idx) => `
         <div class="product-card scroll-reveal" data-category="${p.category}" style="--delay: ${0.1 + idx * 0.1}s">
             ${p.old_price > 0 ? `<div class="product-badge">Best Seller</div>` : ''}
-            <div class="product-image"><img src="${p.image}" alt="${p.name}"></div>
+            <div class="product-image"><img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;"></div>
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <p>${p.short_desc}</p>

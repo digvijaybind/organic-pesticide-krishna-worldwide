@@ -47,13 +47,17 @@ if (!$data) {
     exit;
 }
 
-// Same-origin guard (best effort CSRF protection)
+// Same-origin guard (best effort CSRF protection).
+// Compare bare hostnames (port stripped) so requests via localhost with a
+// custom port, or standard 80/443 production, are treated as same-origin.
 $reqOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
-$reqHost = $_SERVER['HTTP_HOST'] ?? '';
-$allowedHost = getenv('APP_HOST') ?: $reqHost;
+$reqHost = (string)($_SERVER['HTTP_HOST'] ?? '');
+$reqHostName = strtolower(parse_url('//' . $reqHost, PHP_URL_HOST) ?: $reqHost);
+$allowedHost = strtolower((string)(getenv('APP_HOST') ?: $reqHost));
+$allowedHostName = strtolower(parse_url('//' . $allowedHost, PHP_URL_HOST) ?: $allowedHost);
 if ($reqOrigin !== '') {
-    $originHost = parse_url($reqOrigin, PHP_URL_HOST);
-    if ($originHost && $originHost !== $reqHost && $originHost !== $allowedHost) {
+    $originHost = strtolower((string)parse_url($reqOrigin, PHP_URL_HOST));
+    if ($originHost && $originHost !== $reqHostName && $originHost !== $allowedHostName) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Origin not allowed']);
         exit;

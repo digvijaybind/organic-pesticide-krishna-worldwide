@@ -18,12 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Same-origin guard (best effort)
+// Same-origin guard (best effort). Compare bare hostnames so requests via
+// a custom port (localhost) or standard 80/443 are treated as same-origin.
 $reqOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
-$reqHost = $_SERVER['HTTP_HOST'] ?? '';
+$reqHost = (string)($_SERVER['HTTP_HOST'] ?? '');
+$reqHostName = strtolower(parse_url('//' . $reqHost, PHP_URL_HOST) ?: $reqHost);
 if ($reqOrigin !== '') {
-    $originHost = parse_url($reqOrigin, PHP_URL_HOST);
-    if ($originHost && $originHost !== $reqHost) {
+    $originHost = strtolower((string)parse_url($reqOrigin, PHP_URL_HOST));
+    if ($originHost && $originHost !== $reqHostName) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Origin not allowed']);
         exit;

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +6,7 @@
     <title>All Products | Organic Pesticide</title>
     <meta name="description" content="Browse our complete range of natural pesticides, bio-gas fertilizers, soil health products, growth promoters and seeds.">
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/cart.css">
     <link rel="stylesheet" href="../css/animations.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -45,25 +46,37 @@
         <div class="nav-container">
             <a href="../index.html" class="logo"><div class="logo-icon"><i class="fas fa-seedling"></i></div><div class="logo-text"><span class="logo-main">Organic Pesticide</span><span class="logo-sub">100% Natural Solutions</span></div></a>
             <div class="nav-links" id="navLinks"><a href="../index.html" class="nav-link">Home</a><a href="../index.html#about" class="nav-link">About</a><a href="../index.html#products" class="nav-link">Products</a><a href="../index.html#categories" class="nav-link">Categories</a><a href="../index.html#why-us" class="nav-link">Why Us</a><a href="../index.html#contact" class="nav-link">Contact</a></div>
-            <div class="nav-actions"><button class="lang-toggle" id="langToggle"><span class="lang-en">हिं</span><span class="lang-hi" style="display:none;">EN</span></button><a href="../index.html#contact" class="nav-cta">Get Quote</a><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button></div>
+            <div class="nav-actions"><a href="../index.html#contact" class="nav-cta">Get Quote</a><a href="../cart.html" class="cart-link" title="View Cart"><i class="fas fa-shopping-cart"></i><span class="cart-badge" style="display:none;">0</span></a><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button></div>
         </div>
     </nav>
     <section class="page-hero"><div class="container"><div class="breadcrumb"><a href="../index.html">Home</a> / All Products</div><h1>Our Complete Product Range</h1><p>30+ organic products for every stage of your farming journey.</p></div></section>
     <section class="section"><div class="container"><a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
-        <div class="products-filter" style="margin-bottom:40px;">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="pesticide">Pesticides</button>
-            <button class="filter-btn" data-filter="fertilizer">Fertilizers</button>
-            <button class="filter-btn" data-filter="soil">Soil Health</button>
-            <button class="filter-btn" data-filter="growth">Growth</button>
-            <button class="filter-btn" data-filter="seeds">Seeds</button>
-            <button class="filter-btn" data-filter="micro">Micro Nutrition</button>
+        <div class="products-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:40px;">
+            <div class="products-filter" style="margin:0;">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="pesticide">Pesticides</button>
+                <button class="filter-btn" data-filter="fertilizer">Fertilizers</button>
+                <button class="filter-btn" data-filter="soil">Soil Health</button>
+                <button class="filter-btn" data-filter="growth">Growth</button>
+                <button class="filter-btn" data-filter="seeds">Seeds</button>
+                <button class="filter-btn" data-filter="micro">Micro Nutrition</button>
+            </div>
+            <label class="products-sort" style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:#64748b;font-weight:500;">
+                <i class="fas fa-sort-amount-down-alt" style="color:#16a34a;"></i> Sort:
+                <select id="sortSelect" style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:0.9rem;color:#0f172a;background:#fff;cursor:pointer;">
+                    <option value="featured">Featured</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="name-asc">Name: A to Z</option>
+                    <option value="name-desc">Name: Z to A</option>
+                </select>
+            </label>
         </div>
         <div class="product-list-grid" id="allProductsGrid">
             <!-- loaded dynamically -->
         </div>
     </div></section>
-    <footer class="footer"><div class="container"><div class="footer-bottom" style="border:none;"><p>&copy; 2026 Organic Pesticide. All rights reserved.</p></div></div></footer>
+    <footer class="footer"><div class="container"><div class="footer-social" style="justify-content:center;margin-bottom:16px;"><a href="https://www.facebook.com/share/1LMYJp3Vue/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.instagram.com/krishna.world.wide" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.linkedin.com/company/krishna-world-wide-agriculture/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://wa.me/919876543210" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a></div><div class="footer-bottom" style="border:none;"><p>&copy; 2026 Organic Pesticide - Krishna Worldwide. All rights reserved. | <a href="../privacy-policy.html">Privacy Policy</a> | <a href="../refund-policy.html">Refund Policy</a> | <a href="../terms-conditions.html">Terms &amp; Conditions</a></p></div></div></footer>
     <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!" class="whatsapp-widget" target="_blank"><i class="fab fa-whatsapp"></i></a>
     <script src="../js/cart.js"></script>
     <script src="../js/catalog.js"></script>
@@ -71,34 +84,102 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const grid = document.getElementById('allProductsGrid');
+            const sortSelect = document.getElementById('sortSelect');
             const products = await loadProducts();
             if (!products || products.length === 0) { grid.innerHTML = '<p>No products.</p>'; return; }
 
-            grid.innerHTML = products.map((p, i) => `
-                <div class="prod-card cat-${p.category} scroll-reveal" data-category="${p.category}" style="--delay:${0.05 * i}s">
-                    <div class="prod-card-img"><img src="../${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;"></div>
-                    <div class="prod-card-body">
-                        <span class="cat-badge ${p.category}">${p.category.charAt(0).toUpperCase() + p.category.slice(1)}</span>
-                        <h3>${p.name}</h3>
-                        <p>${p.short_desc}</p>
-                        <div class="prod-card-meta">
-                            <span class="prod-price">₹${p.price}${p.old_price > 0 ? ' <span class="old-price" style="font-size:0.8rem;color:#94a3b8;text-decoration:line-through;">₹' + p.old_price + '</span>' : ''}</span>
-                            <button class="btn btn-sm" onclick="location.href='product.html?id=${p.id}'">View</button>
+            // Read initial state from URL (?category=&sort=) so sorting persists.
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentFilter = urlParams.get('category') || 'all';
+            let currentSort = urlParams.get('sort') || 'featured';
+
+            const validFilters = ['all', 'pesticide', 'fertilizer', 'soil', 'biogas', 'growth', 'seeds', 'micro'];
+            const validSorts = ['featured', 'price-asc', 'price-desc', 'name-asc'];
+            if (validFilters.indexOf(currentFilter) === -1) currentFilter = 'all';
+            if (validSorts.indexOf(currentSort) === -1) currentSort = 'featured';
+
+            // Keep controls in sync with the URL state.
+            sortSelect.value = currentSort;
+            document.querySelectorAll('.filter-btn').forEach(b =>
+                b.classList.toggle('active', b.dataset.filter === currentFilter)
+            );
+
+            // Copy with an explicit original order so "Featured" is stable.
+            const all = products.map((p, i) => Object.assign({}, p, { _order: i }));
+
+            // Show a count alongside "All" and per-category counts.
+            function categoryRank(c) {
+                const order = ['fertilizer', 'pesticide', 'soil', 'biogas', 'growth', 'seeds', 'micro'];
+                const idx = order.indexOf(c);
+                return idx === -1 ? 99 : idx;
+            }
+
+            function sortProducts(list) {
+                const arr = list.slice();
+                switch (currentSort) {
+                    case 'price-asc': arr.sort((a, b) => a.price - b.price); break;
+                    case 'price-desc': arr.sort((a, b) => b.price - a.price); break;
+                    case 'name-asc': arr.sort((a, b) => a.name.localeCompare(b.name)); break;
+                    case 'name-desc': arr.sort((a, b) => b.name.localeCompare(a.name)); break;
+                    default:
+                        // Featured: best-sellers first, then grouped by category, then original order.
+                        arr.sort((a, b) => {
+                            if (!!a.featured !== !!b.featured) return (a.featured ? -1 : 1);
+                            const cr = categoryRank(a.category) - categoryRank(b.category);
+                            if (cr !== 0) return cr;
+                            return a._order - b._order;
+                        });
+                }
+                return arr;
+            }
+
+            function updateURL() {
+                try {
+                    const url = new URL(window.location.href);
+                    if (currentFilter !== 'all') url.searchParams.set('category', currentFilter);
+                    else url.searchParams.delete('category');
+                    if (currentSort !== 'featured') url.searchParams.set('sort', currentSort);
+                    else url.searchParams.delete('sort');
+                    history.replaceState(null, '', url.toString());
+                } catch (e) { /* ignore */ }
+            }
+
+            function render() {
+                const list = (currentFilter === 'all') ? all : all.filter(p => p.category === currentFilter);
+                const sorted = sortProducts(list);
+                grid.innerHTML = sorted.map((p, i) => `
+                    <div class="prod-card cat-${p.category} scroll-reveal revealed" data-category="${p.category}" style="--delay:${0.05 * i}s">
+                        <div class="prod-card-img"><img src="../${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;"></div>
+                        <div class="prod-card-body">
+                            <span class="cat-badge ${p.category}">${p.category.charAt(0).toUpperCase() + p.category.slice(1)}</span>
+                            <h3>${p.name}</h3>
+                            <p>${p.short_desc}</p>
+                            <div class="prod-card-meta">
+                                <span class="prod-price">₹${p.price}${p.old_price > 0 ? ' <span class="old-price" style="font-size:0.8rem;color:#94a3b8;text-decoration:line-through;">₹' + p.old_price + '</span>' : ''}</span>
+                                <button class="btn btn-sm" onclick="location.href='product.html?id=${p.id}'">View</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+                updateURL();
+            }
+
+            render();
 
             // Wire up filters
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    const f = btn.dataset.filter;
-                    document.querySelectorAll('#allProductsGrid .prod-card').forEach(card => {
-                        card.style.display = (f === 'all' || card.dataset.category === f) ? '' : 'none';
-                    });
+                    currentFilter = btn.dataset.filter;
+                    render();
                 });
+            });
+
+            // Wire up sorting
+            sortSelect.addEventListener('change', () => {
+                currentSort = sortSelect.value;
+                render();
             });
         });
     </script>

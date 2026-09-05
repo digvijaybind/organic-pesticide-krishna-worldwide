@@ -21,16 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const scrollY = window.scrollY;
 
         // Navbar background
-        if (scrollY > 80) {
+        if (navbar && scrollY > 80) {
             navbar.classList.add('scrolled');
-        } else {
+        } else if (navbar) {
             navbar.classList.remove('scrolled');
         }
 
         // Back to top
-        if (scrollY > 500) {
+        if (backToTop && scrollY > 500) {
             backToTop.classList.add('visible');
-        } else {
+        } else if (backToTop) {
             backToTop.classList.remove('visible');
         }
 
@@ -63,26 +63,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
 
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-    });
-
-    // Close mobile nav on link click
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
+    if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
         });
-    });
 
-    // Close mobile nav on outside click
-    document.addEventListener('click', (e) => {
-        if (!navLinks.contains(e.target) && !hamburger.contains(e.target) && !navbar.contains(e.target)) {
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
-        }
-    });
+        // Close mobile nav on link click
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Close mobile nav on outside click
+        document.addEventListener('click', (e) => {
+            const insideMenu = navLinks.contains(e.target);
+            const onHamburger = hamburger.contains(e.target);
+            const inNavbar = navbar && navbar.contains(e.target);
+            if (!insideMenu && !onHamburger && !inNavbar) {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            }
+        });
+    }
 
     // ===== SCROLL REVEAL =====
     const scrollRevealElements = document.querySelectorAll('.scroll-reveal');
@@ -168,18 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTestimonial = 0;
     let testimonialInterval;
 
-    // Create dots
-    testimonialCards.forEach((_, i) => {
-        const dot = document.createElement('div');
-        dot.classList.add('testimonial-dot');
-        if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => goToTestimonial(i));
-        dotsContainer.appendChild(dot);
-    });
-
-    const dots = document.querySelectorAll('.testimonial-dot');
-
-    function goToTestimonial(index) {
+    function goToTestimonialLocal(index) {
+        if (testimonialCards.length === 0) return;
         testimonialCards[currentTestimonial].classList.remove('active');
         dots[currentTestimonial].classList.remove('active');
         currentTestimonial = index;
@@ -187,57 +182,73 @@ document.addEventListener('DOMContentLoaded', () => {
         dots[currentTestimonial].classList.add('active');
     }
 
-    function nextTestimonial() {
-        const next = (currentTestimonial + 1) % testimonialCards.length;
-        goToTestimonial(next);
-    }
+    // Only initialise slider UI if testimonials exist on this page
+    if (testimonialCards.length > 0 && dotsContainer) {
+        // Create dots
+        testimonialCards.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.classList.add('testimonial-dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToTestimonialLocal(i));
+            dotsContainer.appendChild(dot);
+        });
 
-    function prevTestimonialFn() {
-        const prev = (currentTestimonial - 1 + testimonialCards.length) % testimonialCards.length;
-        goToTestimonial(prev);
-    }
+        const dots = document.querySelectorAll('.testimonial-dot');
 
-    if (nextBtn) nextBtn.addEventListener('click', () => {
-        nextTestimonial();
-        resetAutoplay();
-    });
+        function nextTestimonial() {
+            const next = (currentTestimonial + 1) % testimonialCards.length;
+            goToTestimonialLocal(next);
+        }
 
-    if (prevBtn) prevBtn.addEventListener('click', () => {
-        prevTestimonialFn();
-        resetAutoplay();
-    });
+        function prevTestimonialFn() {
+            const prev = (currentTestimonial - 1 + testimonialCards.length) % testimonialCards.length;
+            goToTestimonialLocal(prev);
+        }
 
-    function startAutoplay() {
-        testimonialInterval = setInterval(nextTestimonial, 5000);
-    }
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+            nextTestimonial();
+            resetAutoplay();
+        });
 
-    function resetAutoplay() {
-        clearInterval(testimonialInterval);
+        if (prevBtn) prevBtn.addEventListener('click', () => {
+            prevTestimonialFn();
+            resetAutoplay();
+        });
+
+        function startAutoplay() {
+            testimonialInterval = setInterval(nextTestimonial, 5000);
+        }
+
+        function resetAutoplay() {
+            clearInterval(testimonialInterval);
+            startAutoplay();
+        }
+
         startAutoplay();
     }
-
-    startAutoplay();
 
     // ===== LANGUAGE TOGGLE (EN/HI) =====
     const langToggle = document.getElementById('langToggle');
     let currentLang = 'en';
 
-    langToggle.addEventListener('click', () => {
-        currentLang = currentLang === 'en' ? 'hi' : 'en';
-        document.querySelectorAll('[data-en]').forEach(el => {
-            const text = el.getAttribute('data-' + currentLang);
-            if (text) {
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                    el.placeholder = text;
-                } else {
-                    el.innerHTML = text;
+    if (langToggle) {
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + currentLang);
+                if (text) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = text;
+                    } else {
+                        el.innerHTML = text;
+                    }
                 }
-            }
+            });
+            // Toggle language labels
+            langToggle.querySelector('.lang-en').style.display = currentLang === 'en' ? 'inline' : 'none';
+            langToggle.querySelector('.lang-hi').style.display = currentLang === 'hi' ? 'inline' : 'none';
         });
-        // Toggle language labels
-        langToggle.querySelector('.lang-en').style.display = currentLang === 'en' ? 'inline' : 'none';
-        langToggle.querySelector('.lang-hi').style.display = currentLang === 'hi' ? 'inline' : 'none';
-    });
+    }
 
     // ===== CONTACT FORM =====
     const contactForm = document.getElementById('contactForm');
@@ -313,6 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => notification.remove(), 4000);
     }
+
+    // Expose globally so catalog.js (and others) can use the shared
+    // notification instead of duplicating markup.
+    window.showNotification = showNotification;
 
     // Add notification animation
     const notifStyle = document.createElement('style');

@@ -6,6 +6,21 @@
  * ============================================================
  */
 
+// Branded placeholder shown when a product image is missing (defined here so
+// it works on pages that do not load catalog.js; identical to catalog.js).
+if (typeof PLACEHOLDER_IMG === 'undefined') {
+    var PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">' +
+        '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#dcfce7"/><stop offset="1" stop-color="#bbf7d0"/>' +
+        '</linearGradient></defs>' +
+        '<rect width="600" height="600" fill="url(#g)"/>' +
+        '<g transform="translate(300,300)"><circle r="120" fill="#ffffff" opacity="0.85"/>' +
+        '<path d="M-70,-40 C-10,-80 50,-60 70,-20 C40,-10 10,-30 -10,-10 L-70,-40 Z M80,-10 C60,50 10,60 -40,40 L20,10 C40,-20 60,-20 80,-10 Z" fill="#16a34a"/>' +
+        '</g></svg>'
+    );
+}
+
 const Cart = (function () {
     const STORAGE_KEY = 'organic_pesticide_cart';
     let cart = [];
@@ -133,7 +148,7 @@ const Cart = (function () {
         container.innerHTML = items.map(item => `
             <div class="cart-item" data-id="${item.id}">
                 <div class="cart-item-img">
-                    <img src="${item.image}" alt="${item.name}">
+                    <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;">
                 </div>
                 <div class="cart-item-info">
                     <h4>${item.name}</h4>

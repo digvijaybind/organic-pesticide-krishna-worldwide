@@ -103,6 +103,13 @@
                                 <div style="font-size:0.8rem;color:#94a3b8;">Secure online payment via Paytm</div>
                             </div>
                         </div>
+                        <div class="pay-method" data-method="cashfree">
+                            <i class="fas fa-credit-card"></i>
+                            <div>
+                                <strong>Card / UPI / NetBanking / Wallet</strong>
+                                <div style="font-size:0.8rem;color:#94a3b8;">Secure online payment via Cashfree</div>
+                            </div>
+                        </div>
                         <div class="pay-method" data-method="cod">
                             <i class="fas fa-money-bill-wave"></i>
                             <div>
@@ -140,8 +147,14 @@
 
     <footer class="footer">
         <div class="container">
+            <div class="footer-social" style="justify-content:center; margin-bottom:16px;">
+                <a href="https://www.facebook.com/share/1LMYJp3Vue/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/krishna.world.wide" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/krishna-world-wide-agriculture/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://wa.me/919876543210" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            </div>
             <div class="footer-bottom" style="border:none;">
-                <p>&copy; 2026 Organic Pesticide - Krishna Worldwide. All rights reserved.</p>
+                <p>&copy; 2026 Organic Pesticide - Krishna Worldwide. All rights reserved. | <a href="privacy-policy.html">Privacy Policy</a> | <a href="refund-policy.html">Refund Policy</a> | <a href="terms-conditions.html">Terms &amp; Conditions</a></p>
             </div>
         </div>
     </footer>
@@ -257,6 +270,12 @@
                 return;
             }
 
+            if (selectedMethod === 'cashfree') {
+                // ---- Additional gateway: Cashfree ----
+                await startCashfree(orderId, customer);
+                return;
+            }
+
             // ---- Fallback gateway: Paytm ----
             await startPaytm(orderId);
         });
@@ -363,6 +382,48 @@
             document.body.appendChild(s);
         }
 
+        // ---- Cashfree payment flow ----
+        async function startCashfree(orderId, customer) {
+            showNote('Setting up payment...', 'info');
+
+            let cf;
+            try {
+                const res = await fetch('backend/cashfree/createOrder.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId })
+                });
+                cf = await res.json();
+            } catch (err) {
+                gPOCUnavailable(orderId);
+                return;
+            }
+
+            if (!cf || !cf.success) {
+                gPOCUnavailable(orderId, cf && cf.message);
+                return;
+            }
+
+            // Load the Cashfree Checkout SDK then open the payment pop-up.
+            loadCashfreeSDK(function () {
+                try {
+                    const cashfree = new Cashfree(cf.checkout_url);
+                    cashfree.redirect({ paymentSessionId: cf.payment_session_id });
+                } catch (e) {
+                    gPOCUnavailable(orderId, 'Cashfree could not be loaded');
+                }
+            });
+        }
+
+        function loadCashfreeSDK(done) {
+            if (window.Cashfree) { done(); return; }
+            const s = document.createElement('script');
+            s.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+            s.onload = function () { done(); };
+            s.onerror = function () { showNote('Could not load payment SDK. Try again.', 'error'); document.getElementById('placeOrderBtn').disabled = false; };
+            document.body.appendChild(s);
+        }
+
         // Gateway unavailable helper (shared: Paytm fallback shows this too).
         function gPOCUnavailable(orderId, backendMsg) {
             showNote(
@@ -460,5 +521,6 @@
             setTimeout(() => el.remove(), 3000);
         }
     </script>
+    <a href="https://wa.me/919876543210?text=Hi%20Organic%20Pesticide!" class="whatsapp-widget" target="_blank"><i class="fab fa-whatsapp"></i></a>
 </body>
 </html>
